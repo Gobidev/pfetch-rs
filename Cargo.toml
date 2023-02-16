@@ -15,7 +15,7 @@ categories = ["command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pfetch-extractor = { path = "./pfetch-extractor" }
+pfetch-extractor = { path = "./pfetch-extractor", version = "0.1.0" }
 globset = "0.4.10"
 dotenv = "0.15.0"
 glob = "0.3.1"
