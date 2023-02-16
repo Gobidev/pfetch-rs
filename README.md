@@ -45,6 +45,11 @@ Please open issues for bugs you are encountering.
 cargo install pfetch
 ```
 
+### AUR
+
+Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) AUR
+package
+
 ## Performance
 
 Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
