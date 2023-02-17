@@ -100,33 +100,11 @@ pub fn total_packages(package_readout: &PackageReadout) -> usize {
             .map(|mngr| packages(mngr, &macchina_package_count))
             .sum()
         }
-        "macos" => {
-            // pkgin
-            run_and_count_lines("pkgin", &["list"])
-            // dpkg
-            + run_and_count_lines("dpkg-query", &["-f", "'.\n'", "-W"])
-            // brew
-            + if check_if_command_exists("brew") {
-                match glob("/usr/local/Cellar/*") {
-                    Ok(files) => files.count(),
-                    Err(_) => 0,
-                }
-            } else {
-                0
-            }
-            // port
-            + match run_system_command("port", &["installed"]) {
-                Ok(output) => {
-                    // port prints a single line to stdout when no packages are installed
-                    if output == "No ports are installed." {
-                        0
-                    } else {
-                    output.lines().count()
-                    }
-                },
-                Err(_) => 0,
-            }
-        }
+        "macos" => package_readout
+            .count_pkgs()
+            .iter()
+            .map(|elem| elem.1)
+            .sum(),
         "freebsd" | "dragonfly" => run_and_count_lines("pkg", &["info"]),
         "openbsd" => match glob("/var/db/pkg/*/") {
             Ok(files) => files.count(),
