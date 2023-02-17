@@ -1,0 +1,140 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Release
+
+jobs:
+  changelog:
+    permissions:
+      contents: write
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v2
+        id: git-cliff
+        with:
+          args: -vv --latest --strip header
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.git-cliff.outputs.content }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  publish:
+    permissions:
+      contents: write
+    name: ${{ matrix.name }} (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - x86_64-apple-darwin
+          - x86_64-unknown-netbsd
+          - x86_64-unknown-freebsd
+          - aarch64-linux-android
+          - aarch64-unknown-linux-musl
+          - armv7-unknown-linux-gnueabihf
+
+        include:
+          - os: ubuntu-latest
+            name: Linux GNU x86_64
+            target: x86_64-unknown-linux-gnu
+            artifact_name: target/x86_64-unknown-linux-gnu/release/pfetch
+            release_name: pfetch-linux-gnu-x86_64
+            cross: false
+            strip: true
+
+          - os: ubuntu-latest
+            name: Linux musl x86_64
+            target: x86_64-unknown-linux-musl
+            artifact_name: target/x86_64-unknown-linux-musl/release/pfetch
+            release_name: pfetch-linux-musl-x86_64
+            cross: true
+            strip: true
+
+          - os: macos-latest
+            name: macOS x86_64
+            target: x86_64-apple-darwin
+            artifact_name: target/x86_64-apple-darwin/release/pfetch
+            release_name: pfetch-macos-x86_64
+            cross: false
+            strip: true
+
+          - os: ubuntu-latest
+            name: NetBSD x86_64
+            target: x86_64-unknown-netbsd
+            artifact_name: target/x86_64-unknown-netbsd/release/pfetch
+            release_name: pfetch-netbsd-x86_64
+            cross: true
+            strip: true
+
+          - os: ubuntu-latest
+            name: freeBSD x86_64
+            target: x86_64-unknown-freebsd
+            artifact_name: target/x86_64-unknown-freebsd/release/pfetch
+            release_name: pfetch-freebsd-x86_64
+            cross: true
+            strip: true
+
+          - os: ubuntu-latest
+            name: Android
+            target: aarch64-linux-android
+            artifact_name: target/aarch64-linux-android/release/pfetch
+            release_name: pfetch-android-aarch64
+            cross: true
+            strip: true
+
+          - os: ubuntu-latest
+            name: Linux musl aarch64
+            target: aarch64-unknown-linux-musl
+            artifact_name: target/aarch64-unknown-linux-musl/release/pfetch
+            release_name: pfetch-linux-musl-aarch64
+            cross: true
+            strip: true
+
+          - os: ubuntu-latest
+            name: Linux ARMv7
+            target: armv7-unknown-linux-gnueabihf
+            artifact_name: target/armv7-unknown-linux-gnueabihf/release/pfetch
+            release_name: pfetch-linux-gnueabihf-armv7
+            cross: true
+            strip: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Bootstrap
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target=${{ matrix.target }} --release
+          use-cross: ${{ matrix.cross }}
+
+      - name: Compress binaries
+        run: tar cfzv ${{ matrix.release_name }}.tar.gz -C "$(dirname ${{ matrix.artifact_name}})" "$(basename ${{ matrix.artifact_name }})"
+
+      - name: Upload binaries
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.release_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
