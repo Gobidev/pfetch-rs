@@ -245,8 +245,13 @@ fn main() {
     let os = get_info(&PfetchInfo::Os, &readouts).unwrap_or_default();
 
     let logo_override = env::var("PF_ASCII");
-    let logo_name = logo_override.as_ref().unwrap_or(&os);
-    let mut logo = pfetch::logo(logo_name);
+
+    let logo_name = logo_override.unwrap_or(match env::consts::OS {
+        "linux" => os.clone(),
+        other => other.to_owned(),
+    });
+
+    let mut logo = pfetch::logo(&logo_name);
 
     // color overrides
     if let Ok(newcolor) = dotenv::var("PF_COL1") {
