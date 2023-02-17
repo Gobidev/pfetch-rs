@@ -39,6 +39,11 @@ Please open issues for bugs you are encountering.
 
 ## Installation
 
+### Binary
+
+Download a binary from the
+[latest release](https://github.com/Gobidev/pfetch-rs/releases/latest).
+
 ### Cargo
 
 ```sh
@@ -47,8 +52,8 @@ cargo install pfetch
 
 ### AUR
 
-Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) AUR
-package
+Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) or
+[pfetch-rs-bin](https://aur.archlinux.org/packages/pfetch-rs-bin) AUR package.
 
 ## Performance
 
