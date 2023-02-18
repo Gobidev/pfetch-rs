@@ -83,15 +83,15 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
         .max()
         .unwrap_or(0);
 
-    let padding1 = match dotenv::var("PF_PAD1") {
+    let padding1 = match dotenvy::var("PF_PAD1") {
         Ok(padding0) => padding0.parse::<usize>().unwrap_or(0),
         Err(_) => 0,
     };
-    let padding2 = match dotenv::var("PF_PAD2") {
+    let padding2 = match dotenvy::var("PF_PAD2") {
         Ok(padding1) => padding1.parse::<usize>().unwrap_or(0),
         Err(_) => 3,
     };
-    let padding3 = match dotenv::var("PF_PAD3") {
+    let padding3 = match dotenvy::var("PF_PAD3") {
         Ok(padding2) => padding2.parse::<usize>().unwrap_or(0),
         Err(_) => 1,
     };
@@ -115,14 +115,14 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
             info1 = info.get(l).map_or("", |line| &line.1),
             separator = info.get(l).map_or("".to_string(), |line|
                 if ! &line.2.is_empty() {
-                    dotenv::var("PF_SEP").unwrap_or_default()
+                    dotenvy::var("PF_SEP").unwrap_or_default()
                 } else { "".to_string() }
             ),
             padding3 = " ".repeat(
                 info1_width.saturating_sub(info.get(l).map_or(0, |(_, line, _)| line.len()))
                     + padding3
             ),
-            color2 = match dotenv::var("PF_COL2") {
+            color2 = match dotenvy::var("PF_COL2") {
                 Ok(newcolor) => {
                     match pfetch::Color::from_str(&newcolor) {
                         Ok(newcolor) => format!("{newcolor}"),
@@ -136,7 +136,7 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
     }
 
     // if colors are disabled, remove them from string
-    if dotenv::var("PF_COLOR").unwrap_or_default() == "0" {
+    if dotenvy::var("PF_COLOR").unwrap_or_default() == "0" {
         pfetch_str = pfetch_str
             .split("\x1b[")
             .map(|chunk| chunk.chars().skip(3).collect::<String>())
@@ -156,11 +156,11 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
         PfetchInfo::Title => {
-            let hostname_override = match dotenv::var("HOSTNAME") {
+            let hostname_override = match dotenvy::var("HOSTNAME") {
                 Ok(hostname) => Some(hostname),
                 Err(_) => None,
             };
-            let username_override = match dotenv::var("USER") {
+            let username_override = match dotenvy::var("USER") {
                 Ok(username) => Some(username),
                 Err(_) => None,
             };
@@ -176,16 +176,16 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts) -> Option<String> {
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
         PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout).to_string()),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
-        PfetchInfo::Shell => match dotenv::var("SHELL") {
+        PfetchInfo::Shell => match dotenvy::var("SHELL") {
             Ok(shell) => Some(shell),
             Err(_) => pfetch::shell(&readouts.general_readout),
         },
-        PfetchInfo::Editor => match dotenv::var("EDITOR") {
+        PfetchInfo::Editor => match dotenvy::var("EDITOR") {
             Ok(editor) => Some(editor),
             Err(_) => pfetch::editor(),
         },
         PfetchInfo::Wm => pfetch::wm(&readouts.general_readout),
-        PfetchInfo::De => match dotenv::var("XDG_CURRENT_DESKTOP") {
+        PfetchInfo::De => match dotenvy::var("XDG_CURRENT_DESKTOP") {
             Ok(de) => Some(de),
             Err(_) => pfetch::de(&readouts.general_readout),
         },
@@ -196,11 +196,11 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts) -> Option<String> {
 
 fn main() {
     // source file specified by env: PF_SOURCE
-    if let Ok(filepath) = dotenv::var("PF_SOURCE") {
-        dotenv::from_path(filepath).unwrap();
+    if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
+        dotenvy::from_path(filepath).unwrap();
     }
 
-    let enabled_pf_info_base: Vec<PfetchInfo> = match dotenv::var("PF_INFO") {
+    let enabled_pf_info_base: Vec<PfetchInfo> = match dotenvy::var("PF_INFO") {
         Ok(pfetch_infos) => pfetch_infos
             .trim()
             .split(' ')
@@ -254,13 +254,13 @@ fn main() {
     let mut logo = pfetch::logo(&logo_name);
 
     // color overrides
-    if let Ok(newcolor) = dotenv::var("PF_COL1") {
+    if let Ok(newcolor) = dotenvy::var("PF_COL1") {
         if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
             logo.primary_color = newcolor;
         }
     }
 
-    if let Ok(newcolor) = dotenv::var("PF_COL3") {
+    if let Ok(newcolor) = dotenvy::var("PF_COL3") {
         if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
             logo.secondary_color = newcolor;
         }
