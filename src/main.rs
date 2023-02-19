@@ -152,7 +152,7 @@ struct Readouts {
     kernel_readout: KernelReadout,
 }
 
-fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow: bool) -> Option<String> {
+fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow_package_managers: bool) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
         PfetchInfo::Title => {
@@ -200,7 +200,7 @@ fn main() {
         dotenvy::from_path(filepath).unwrap();
     }
     // Check if SKIP_SLOW is enabled
-    let skip_slow = dotenvy::var("SKIP_SLOW").map_or(false, |val| val == "true");
+    let skip_slow = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
 
     let enabled_pf_info_base: Vec<PfetchInfo> = match dotenvy::var("PF_INFO") {
         Ok(pfetch_infos) => pfetch_infos

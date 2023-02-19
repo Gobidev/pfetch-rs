@@ -73,7 +73,7 @@ pub enum PackageManager {
 
 /// Obtain the amount of installed packages on the system by checking all installed supported package
 /// managers and adding the amounts
-pub fn total_packages(package_readout: &PackageReadout, skip_slow: bool) -> usize {
+pub fn total_packages(package_readout: &PackageReadout, skip_slow_package_managers: bool) -> usize {
     match env::consts::OS {
         "linux" => {
             let macchina_package_count: Vec<(String, usize)> = package_readout
@@ -130,7 +130,7 @@ fn get_macchina_package_count(
 
 /// return the amount of packages installed with a given linux package manager
 /// Return `0` if the package manager is not installed
-fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)], skip_slow: bool) -> usize {
+fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)], skip_slow_package_managers: bool) -> usize {
     match pkg_manager {
         // libmacchina has very fast implementations for most package managers, so we use them
         // where we can, otherwise we fall back to method used by dylans version of pfetch
