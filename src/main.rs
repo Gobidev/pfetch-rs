@@ -174,7 +174,7 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow_package_managers: 
         PfetchInfo::Host => pfetch::host(),
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
-        PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout, skip_slow).to_string()),
+        PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout, skip_slow_package_managers).to_string()),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
         PfetchInfo::Shell => match dotenvy::var("SHELL") {
             Ok(shell) => Some(shell),
