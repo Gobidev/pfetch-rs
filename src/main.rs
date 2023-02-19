@@ -200,7 +200,7 @@ fn main() {
         dotenvy::from_path(filepath).unwrap();
     }
     // Check if SKIP_SLOW is enabled
-    let skip_slow = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
+    let skip_slow_package_managers = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
 
     let enabled_pf_info_base: Vec<PfetchInfo> = match dotenvy::var("PF_INFO") {
         Ok(pfetch_infos) => pfetch_infos
@@ -244,7 +244,7 @@ fn main() {
         kernel_readout: KernelReadout::new(),
     };
 
-    let os = get_info(&PfetchInfo::Os, &readouts, skip_slow).unwrap_or_default();
+    let os = get_info(&PfetchInfo::Os, &readouts, skip_slow_package_managers).unwrap_or_default();
 
     let logo_override = env::var("PF_ASCII");
 
@@ -271,7 +271,7 @@ fn main() {
     let gathered_pfetch_info: Vec<(pfetch::Color, String, String)> = enabled_pf_info
         .iter()
         .filter_map(|info| {
-            let info_result = get_info(info, &readouts, skip_slow);
+            let info_result = get_info(info, &readouts, skip_slow_package_managers);
             match info_result {
                 Some(info_str) => match info {
                     PfetchInfo::Title => Some((logo.secondary_color, info_str, "".to_string())),
