@@ -131,6 +131,7 @@ fn get_macchina_package_count(
 /// return the amount of packages installed with a given linux package manager
 /// Return `0` if the package manager is not installed
 fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)]) -> usize {
+    let args: Vec<String> = env::args().collect();
     match pkg_manager {
         // libmacchina has very fast implementations for most package managers, so we use them
         // where we can, otherwise we fall back to method used by dylans version of pfetch
@@ -176,7 +177,7 @@ fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usi
         }
         // TODO: nix -q is very slow
         PackageManager::Nix => {
-            if check_if_command_exists("nix-store") {
+            if check_if_command_exists("nix-store") || !args.contains(&"--no-nix".to_owned()) || !args.contains(&"-n".to_owned()) {
                 run_and_count_lines(
                     "nix-store",
                     &["-q", "--requisites", "/run/current-system/sw"],
