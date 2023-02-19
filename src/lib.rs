@@ -97,7 +97,7 @@ pub fn total_packages(package_readout: &PackageReadout, skip_slow_package_manage
                 PackageManager::Nix,
             ]
             .iter()
-            .map(|mngr| packages(mngr, &macchina_package_count, skip_slow))
+            .map(|mngr| packages(mngr, &macchina_package_count, skip_slow_package_managers))
             .sum()
         }
         "macos" => package_readout
@@ -176,7 +176,7 @@ fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usi
         }
         // TODO: nix -q is very slow
         PackageManager::Nix => {
-            if check_if_command_exists("nix-store") && !skip_slow {
+            if check_if_command_exists("nix-store") && !skip_slow_package_managers {
                 run_and_count_lines(
                     "nix-store",
                     &["-q", "--requisites", "/run/current-system/sw"],
