@@ -152,7 +152,7 @@ struct Readouts {
     kernel_readout: KernelReadout,
 }
 
-fn get_info(info: &PfetchInfo, readouts: &Readouts) -> Option<String> {
+fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow_package_managers: bool) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
         PfetchInfo::Title => {
@@ -174,7 +174,7 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts) -> Option<String> {
         PfetchInfo::Host => pfetch::host(),
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
-        PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout).to_string()),
+        PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout, skip_slow_package_managers).to_string()),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
         PfetchInfo::Shell => match dotenvy::var("SHELL") {
             Ok(shell) => Some(shell),
@@ -199,6 +199,8 @@ fn main() {
     if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
         dotenvy::from_path(filepath).unwrap();
     }
+    // Check if SKIP_SLOW is enabled
+    let skip_slow_package_managers = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
 
     let enabled_pf_info_base: Vec<PfetchInfo> = match dotenvy::var("PF_INFO") {
         Ok(pfetch_infos) => pfetch_infos
@@ -242,7 +244,7 @@ fn main() {
         kernel_readout: KernelReadout::new(),
     };
 
-    let os = get_info(&PfetchInfo::Os, &readouts).unwrap_or_default();
+    let os = get_info(&PfetchInfo::Os, &readouts, skip_slow_package_managers).unwrap_or_default();
 
     let logo_override = env::var("PF_ASCII");
 
@@ -269,7 +271,7 @@ fn main() {
     let gathered_pfetch_info: Vec<(pfetch::Color, String, String)> = enabled_pf_info
         .iter()
         .filter_map(|info| {
-            let info_result = get_info(info, &readouts);
+            let info_result = get_info(info, &readouts, skip_slow_package_managers);
             match info_result {
                 Some(info_str) => match info {
                     PfetchInfo::Title => Some((logo.secondary_color, info_str, "".to_string())),
