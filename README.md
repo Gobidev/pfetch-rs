@@ -68,7 +68,9 @@ Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
 
 _Note: This is with `pacman` being the only installed package manager.
 Especially having `nix` installed will have a big impact on performance, as
-querying installed `nix` packages is very costly._
+querying installed `nix` packages is very costly. If you want to skip slow
+package managers from being counted, you can set the `PF_FAST_PKG_COUNT`
+environment variable._
 
 ## Configuration
 
@@ -155,5 +157,8 @@ SHELL=""
 
 # Which desktop environment to display.
 XDG_CURRENT_DESKTOP=""
+
+# Skip package managers that take "long" to query package count (like nix)
+PF_FAST_PKG_COUNT=1
 
 ```
