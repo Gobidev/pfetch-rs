@@ -73,7 +73,7 @@ pub enum PackageManager {
 
 /// Obtain the amount of installed packages on the system by checking all installed supported package
 /// managers and adding the amounts
-pub fn total_packages(package_readout: &PackageReadout) -> usize {
+pub fn total_packages(package_readout: &PackageReadout, skip_slow: bool) -> usize {
     match env::consts::OS {
         "linux" => {
             let macchina_package_count: Vec<(String, usize)> = package_readout
@@ -97,7 +97,7 @@ pub fn total_packages(package_readout: &PackageReadout) -> usize {
                 PackageManager::Nix,
             ]
             .iter()
-            .map(|mngr| packages(mngr, &macchina_package_count))
+            .map(|mngr| packages(mngr, &macchina_package_count, skip_slow))
             .sum()
         }
         "macos" => package_readout
@@ -130,8 +130,7 @@ fn get_macchina_package_count(
 
 /// return the amount of packages installed with a given linux package manager
 /// Return `0` if the package manager is not installed
-fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)]) -> usize {
-    let args: Vec<String> = env::args().collect();
+fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)], skip_slow: bool) -> usize {
     match pkg_manager {
         // libmacchina has very fast implementations for most package managers, so we use them
         // where we can, otherwise we fall back to method used by dylans version of pfetch
@@ -177,7 +176,7 @@ fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usi
         }
         // TODO: nix -q is very slow
         PackageManager::Nix => {
-            if check_if_command_exists("nix-store") || !args.contains(&"--no-nix".to_owned()) || !args.contains(&"-n".to_owned()) {
+            if check_if_command_exists("nix-store") && !skip_slow {
                 run_and_count_lines(
                     "nix-store",
                     &["-q", "--requisites", "/run/current-system/sw"],
