@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0] - 2023-02-19
+
+### Documentation
+
+- Add binary installation option to README.md
+- Add `PF_FAST_PKG_COUNT` to available options in README.md
+
+### Features
+
+- [**breaking**] Add option to skip count of nix packages (#2, #10)
+
+### Miscellaneous
+
+- Use dotenvy instead of dotenv
+
 ## [0.1.1] - 2023-02-17
 
 ### Bug Fixes
