@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.0] - 2023-02-21
+
+### Bug Fixes
+
+- [**breaking**] Fix OS and host detection on macOS
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [1.0.0] - 2023-02-19
 
 ### Documentation
