@@ -152,7 +152,11 @@ struct Readouts {
     kernel_readout: KernelReadout,
 }
 
-fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow_package_managers: bool) -> Option<String> {
+fn get_info(
+    info: &PfetchInfo,
+    readouts: &Readouts,
+    skip_slow_package_managers: bool,
+) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
         PfetchInfo::Title => {
@@ -171,10 +175,13 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts, skip_slow_package_managers: 
             )
         }
         PfetchInfo::Os => pfetch::os(&readouts.general_readout),
-        PfetchInfo::Host => pfetch::host(),
+        PfetchInfo::Host => pfetch::host(&readouts.general_readout),
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
-        PfetchInfo::Pkgs => Some(pfetch::total_packages(&readouts.package_readout, skip_slow_package_managers).to_string()),
+        PfetchInfo::Pkgs => Some(
+            pfetch::total_packages(&readouts.package_readout, skip_slow_package_managers)
+                .to_string(),
+        ),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
         PfetchInfo::Shell => match dotenvy::var("SHELL") {
             Ok(shell) => Some(shell),

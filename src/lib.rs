@@ -100,11 +100,7 @@ pub fn total_packages(package_readout: &PackageReadout, skip_slow: bool) -> usiz
             .map(|mngr| packages(mngr, &macchina_package_count, skip_slow))
             .sum()
         }
-        "macos" => package_readout
-            .count_pkgs()
-            .iter()
-            .map(|elem| elem.1)
-            .sum(),
+        "macos" => package_readout.count_pkgs().iter().map(|elem| elem.1).sum(),
         "freebsd" | "dragonfly" => run_and_count_lines("pkg", &["info"]),
         "openbsd" => match glob("/var/db/pkg/*/") {
             Ok(files) => files.count(),
@@ -130,7 +126,11 @@ fn get_macchina_package_count(
 
 /// return the amount of packages installed with a given linux package manager
 /// Return `0` if the package manager is not installed
-fn packages(pkg_manager: &PackageManager, macchina_package_count: &[(String, usize)], skip_slow: bool) -> usize {
+fn packages(
+    pkg_manager: &PackageManager,
+    macchina_package_count: &[(String, usize)],
+    skip_slow: bool,
+) -> usize {
     match pkg_manager {
         // libmacchina has very fast implementations for most package managers, so we use them
         // where we can, otherwise we fall back to method used by dylans version of pfetch
@@ -234,9 +234,15 @@ pub fn memory(memory_readout: &MemoryReadout) -> Option<String> {
 }
 
 pub fn os(general_readout: &GeneralReadout) -> Option<String> {
-    match general_readout.distribution() {
-        Ok(distribution) => Some(distribution),
-        Err(_) => None,
+    match env::consts::OS {
+        "linux" => match general_readout.distribution() {
+            Ok(distribution) => Some(distribution),
+            Err(_) => None,
+        },
+        _ => match general_readout.os_name() {
+            Ok(os) => Some(os),
+            Err(_) => None,
+        },
     }
 }
 
@@ -276,61 +282,73 @@ pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
     }
 }
 
-pub fn host() -> Option<String> {
-    const BLACKLIST: &[&str] = &[
-        "To",
-        "Be",
-        "be",
-        "Filled",
-        "filled",
-        "By",
-        "by",
-        "O.E.M.",
-        "OEM",
-        "Not",
-        "Applicable",
-        "Specified",
-        "System",
-        "Product",
-        "Name",
-        "Version",
-        "Undefined",
-        "Default",
-        "string",
-        "INVALID",
-        "�",
-        "os",
-        "Type1ProductConfigId",
-        "",
-    ];
+pub fn host(general_readout: &GeneralReadout) -> Option<String> {
+    match env::consts::OS {
+        "linux" => {
+            const BLACKLIST: &[&str] = &[
+                "To",
+                "Be",
+                "be",
+                "Filled",
+                "filled",
+                "By",
+                "by",
+                "O.E.M.",
+                "OEM",
+                "Not",
+                "Applicable",
+                "Specified",
+                "System",
+                "Product",
+                "Name",
+                "Version",
+                "Undefined",
+                "Default",
+                "string",
+                "INVALID",
+                "�",
+                "os",
+                "Type1ProductConfigId",
+                "",
+            ];
 
-    // get device from system files
-    let product_name =
-        fs::read_to_string("/sys/devices/virtual/dmi/id/product_name").unwrap_or_default();
-    let product_name = product_name.trim();
-    let product_version =
-        fs::read_to_string("/sys/devices/virtual/dmi/id/product_version").unwrap_or_default();
-    let product_version = product_version.trim();
-    let product_model =
-        fs::read_to_string("/sys/firmware/devicetree/base/model").unwrap_or_default();
-    let product_model = product_model.trim();
+            // get device from system files
+            let product_name =
+                fs::read_to_string("/sys/devices/virtual/dmi/id/product_name").unwrap_or_default();
+            let product_name = product_name.trim();
+            let product_version = fs::read_to_string("/sys/devices/virtual/dmi/id/product_version")
+                .unwrap_or_default();
+            let product_version = product_version.trim();
+            let product_model =
+                fs::read_to_string("/sys/firmware/devicetree/base/model").unwrap_or_default();
+            let product_model = product_model.trim();
 
-    let final_str = format!("{product_name} {product_version} {product_model}")
-        .split(' ')
-        .filter(|word| !BLACKLIST.contains(word))
-        .collect::<Vec<_>>()
-        .join(" ");
+            let final_str = format!("{product_name} {product_version} {product_model}")
+                .split(' ')
+                .filter(|word| !BLACKLIST.contains(word))
+                .collect::<Vec<_>>()
+                .join(" ");
 
-    // if string is empty, display system architecture instead
-    let final_str = if final_str.is_empty() {
-        run_system_command("uname", &["-m"]).unwrap_or("Unknown".to_owned())
-    } else {
-        final_str
-    };
-    if final_str.is_empty() {
-        None
-    } else {
-        Some(final_str)
+            // if string is empty, display system architecture instead
+            let final_str = if final_str.is_empty() {
+                run_system_command("uname", &["-m"]).unwrap_or("Unknown".to_owned())
+            } else {
+                final_str
+            };
+            if final_str.is_empty() {
+                None
+            } else {
+                Some(final_str)
+            }
+        }
+        "macos" => match general_readout.machine() {
+            Ok(host) => Some(host),
+            Err(_) => None,
+        },
+        _ => match general_readout.cpu_model_name() {
+            Ok(host) => Some(host),
+            Err(_) => None,
+        },
     }
 }
 
