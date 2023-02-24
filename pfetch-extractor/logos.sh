@@ -659,6 +659,17 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Ww]indows*)
+        read_ascii 4 <<- EOF
+				${c4}llllll  llllll
+				${c4}llllll  llllll
+				${c4}llllll  llllll
+				${c4}
+				${c4}llllll  llllll
+				${c4}llllll  llllll
+				${c4}llllll  llllll
+			EOF
+        ;;
     [Xx]eonix*)
         read_ascii 2 <<- EOF
 				${c2}    ___  ___
