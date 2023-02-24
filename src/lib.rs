@@ -341,13 +341,12 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
                 Some(final_str)
             }
         }
-        "macos" => match general_readout.machine() {
+        _ => match general_readout.machine() {
             Ok(host) => Some(host),
-            Err(_) => None,
-        },
-        _ => match general_readout.cpu_model_name() {
-            Ok(host) => Some(host),
-            Err(_) => None,
+            Err(_) => match general_readout.cpu_model_name() {
+                Ok(host) => Some(host),
+                Err(_) => None,
+            },
         },
     }
 }

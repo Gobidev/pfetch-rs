@@ -251,7 +251,7 @@ fn main() {
         kernel_readout: KernelReadout::new(),
     };
 
-    let os = get_info(&PfetchInfo::Os, &readouts, skip_slow_package_managers).unwrap_or_default();
+    let os = pfetch::os(&GeneralReadout::new()).unwrap_or_default();
 
     let logo_override = env::var("PF_ASCII");
 
@@ -277,19 +277,21 @@ fn main() {
 
     let gathered_pfetch_info: Vec<(pfetch::Color, String, String)> = enabled_pf_info
         .iter()
-        .filter_map(|info| {
-            let info_result = get_info(info, &readouts, skip_slow_package_managers);
-            match info_result {
-                Some(info_str) => match info {
-                    PfetchInfo::Title => Some((logo.secondary_color, info_str, "".to_string())),
-                    PfetchInfo::Os => Some((logo.primary_color, info.to_string(), os.to_owned())),
-                    PfetchInfo::BlankLine => {
-                        Some((logo.primary_color, "".to_string(), "".to_string()))
-                    }
-                    PfetchInfo::Palette => Some((logo.primary_color, info_str, "".to_string())),
-                    _ => Some((logo.primary_color, info.to_string(), info_str)),
-                },
-                None => None,
+        .filter_map(|info| match info {
+            PfetchInfo::Os => Some((logo.primary_color, info.to_string(), os.clone())),
+            _ => {
+                let info_result = get_info(info, &readouts, skip_slow_package_managers);
+                match info_result {
+                    Some(info_str) => match info {
+                        PfetchInfo::Title => Some((logo.secondary_color, info_str, "".to_string())),
+                        PfetchInfo::BlankLine => {
+                            Some((logo.primary_color, "".to_string(), "".to_string()))
+                        }
+                        PfetchInfo::Palette => Some((logo.primary_color, info_str, "".to_string())),
+                        _ => Some((logo.primary_color, info.to_string(), info_str)),
+                    },
+                    None => None,
+                }
             }
         })
         .collect();
