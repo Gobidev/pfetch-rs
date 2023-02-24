@@ -100,17 +100,7 @@ pub fn total_packages(package_readout: &PackageReadout, skip_slow: bool) -> usiz
             .map(|mngr| packages(mngr, &macchina_package_count, skip_slow))
             .sum()
         }
-        "macos" => package_readout.count_pkgs().iter().map(|elem| elem.1).sum(),
-        "freebsd" | "dragonfly" => run_and_count_lines("pkg", &["info"]),
-        "openbsd" => match glob("/var/db/pkg/*/") {
-            Ok(files) => files.count(),
-            Err(_) => 0,
-        },
-        "netbsd" => run_and_count_lines("pkg_info", &[]),
-        "solaris" => {
-            run_and_count_lines("pkginfo", &["-i"]) + run_and_count_lines("pkg", &["list"])
-        }
-        _ => 0,
+        _ => package_readout.count_pkgs().iter().map(|elem| elem.1).sum(),
     }
 }
 
