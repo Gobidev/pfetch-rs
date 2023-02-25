@@ -18,12 +18,13 @@ into problems, please open an issue._
 
 **Included Logos:** Alpine Linux, Android, Arch Linux, ArcoLinux, Artix Linux,
 Bedrock Linux, Buildroot, CelOS, CentOS, Crystal Linux, dahliaOS, Debian,
-Devuan, DragonflyBSD, Elementary OS, EndeavourOS, Fedora, FreeBSD, Garuda Linux,
-Gentoo Linux, Gnu, Guix, Haiku, HydroOS, Hyperbola, instantOS, IRIX, KDE neon,
-Linux Lite, Linux, Mint, macOS, Mageia, Manjaro, Minix, MX Linux, NetBSD, NixOS,
-OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Parabola, Pop!\_OS
-(updated), PureOS, Raspbian, SerenityOS, Slackware, Solus, Solaris, Ubuntu, Void
-Linux, Xeonix Linux, Fiwix (new), MorphOS (new), AmogOS (new), Aperio (new)
+Devuan, DietPi, DragonflyBSD, Elementary OS, EndeavourOS, Fedora, FreeBSD,
+Garuda Linux, Gentoo Linux, Gnu, Guix, Haiku, HydroOS, Hyperbola, instantOS,
+IRIX, KDE neon, Linux Lite, Linux, Mint, macOS, Mageia, Manjaro, Minix, MX
+Linux, NetBSD, NixOS, OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt,
+Parabola, Pop!\_OS (updated), PureOS, Raspbian, SerenityOS, Slackware, Solus,
+Solaris, Ubuntu, Void Linux, Xeonix Linux, Fiwix (new), MorphOS (new), AmogOS
+(new)
 
 For all other distributions, a penguin will be displayed.
 
@@ -160,5 +161,4 @@ XDG_CURRENT_DESKTOP=""
 
 # Skip package managers that take "long" to query package count (like nix)
 PF_FAST_PKG_COUNT=1
-
 ```

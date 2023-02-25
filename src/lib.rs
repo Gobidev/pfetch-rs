@@ -8,12 +8,15 @@ use libmacchina::{
 };
 use pfetch_extractor::parse_logos;
 
-#[derive(Clone, Copy)]
-pub struct Color(pub u8);
+#[derive(Clone, Copy, Debug)]
+pub struct Color(pub Option<u8>);
 
 impl Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\x1b[3{}m", self.0)
+        match self.0 {
+            Some(color) => write!(f, "\x1b[38;5;{color}m"),
+            None => write!(f, "\x1b[39m"),
+        }
     }
 }
 
@@ -21,16 +24,7 @@ impl FromStr for Color {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        match s.parse::<u8>() {
-            Ok(color) => {
-                if color >= 9 {
-                    Err(format!("Invalid color: {color}"))
-                } else {
-                    Ok(Color(color))
-                }
-            }
-            Err(_) => Err(format!("Not a valid color: {s}")),
-        }
+        Ok(Color(s.parse::<u8>().ok()))
     }
 }
 

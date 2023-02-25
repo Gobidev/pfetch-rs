@@ -178,6 +178,17 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Dd]iet[Pp]i*)
+        read_ascii 8 2 <<- EOF
+				${c2}  __  __
+				${c2} (_\\)(/_)
+				${c8} (______)
+				${c8}(_${c2}<>${c8}__${c2}<>${c8}_)
+				${c8} (__${c2}''${c8}__)
+				${c8}   (__)
+			EOF
+        ;;
+
     [Dd]ragon[Ff]ly*)
         read_ascii 1 <<- EOF
 				    ,${c1}_${c7},
@@ -693,7 +704,7 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 				 ${c6}/____/ ${c4}/____/
 			EOF
         ;;
-    [Mm]orphOS*)
+    [Mm]orph[Oo][Ss]*)
         read_ascii 1 <<- EOF
 				${c4}  __ \/ __
 				${c4} /o \{}/ o\\
