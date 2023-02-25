@@ -18,6 +18,7 @@ crystallinux
 dahlia
 debian
 devuan
+dietpi
 dragonfly
 elementary
 endeavour
@@ -62,5 +63,4 @@ xeonix
 fiwix
 morphos
 amogos
-aperio
 EOF

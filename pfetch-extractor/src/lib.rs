@@ -63,17 +63,10 @@ fn parse_logo(input: &str) -> Option<(bool, proc_macro2::TokenStream)> {
     let mut logo_parts = vec![];
     for logo_part in logo.split("${") {
         if let Some((new_color, rest)) = logo_part.split_once('}') {
-            let new_color: u8 = match new_color {
-                "c0" => 0,
-                "c1" => 1,
-                "c2" => 2,
-                "c3" => 3,
-                "c4" => 4,
-                "c5" => 5,
-                "c6" => 6,
-                "c7" => 7,
-                _ => panic!("Unknown color: {new_color}"),
-            };
+            let new_color: u8 = new_color
+                .get(1..)
+                .and_then(|num| num.parse().ok())
+                .unwrap_or_else(|| panic!("Invalid color: {new_color}"));
             let rest = rest.replace("\\\\", "\\");
             let rest = rest.replace("\\`", "`");
             let lines = rest.split('\n').collect::<Vec<_>>();
@@ -83,11 +76,11 @@ fn parse_logo(input: &str) -> Option<(bool, proc_macro2::TokenStream)> {
                 if index != last_index {
                     line += "\n";
                 }
-                logo_parts.push(quote! { (Color(#new_color), #line) });
+                logo_parts.push(quote! { (Color(Some(#new_color)), #line) });
             }
         } else if !logo_part.is_empty() {
             let logo_part = logo_part.replace("\\\\", "\\");
-            logo_parts.push(quote! { (Color(9), #logo_part) });
+            logo_parts.push(quote! { (Color(None), #logo_part) });
         }
     }
 
@@ -95,8 +88,8 @@ fn parse_logo(input: &str) -> Option<(bool, proc_macro2::TokenStream)> {
         pattern == "[Ll]inux*",
         quote! {
             Logo {
-                primary_color: Color(#primary_color),
-                secondary_color: Color(#secondary_color),
+                primary_color: Color(Some(#primary_color)),
+                secondary_color: Color(Some(#secondary_color)),
                 pattern: #pattern,
                 logo_parts: &[#(#logo_parts),*],
             }
