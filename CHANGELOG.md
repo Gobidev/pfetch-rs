@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.1.0] - 2023-02-28
+
+### Bug Fixes
+
+- Fix os and host detection on Windows
+
+### Documentation
+
+- Add new logos to README.md
+
+### Features
+
+- Add windows ascii logo
+- Use libmacchina package count for Windows and BSD
+- Add DietPi logo and support all 256 ANSI colors
+
+### Miscellaneous
+
+- Sort logos alphabetically
+
 ## [2.0.0] - 2023-02-21
 
 ### Bug Fixes

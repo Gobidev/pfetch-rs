@@ -744,7 +744,7 @@ dependencies = [
 
 [[package]]
 name = "pfetch"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "dotenvy",
  "glob",
@@ -756,7 +756,7 @@ dependencies = [
 
 [[package]]
 name = "pfetch-extractor"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
