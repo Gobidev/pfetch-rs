@@ -7,6 +7,7 @@ while read -r logo; do
 done << EOF
 alpine
 android
+amogos
 arch
 arco
 artix
@@ -23,6 +24,7 @@ dragonfly
 elementary
 endeavour
 fedora
+fiwix
 freebsd
 garuda
 gentoo
@@ -41,6 +43,7 @@ linux
 macos
 mageia
 manjaro
+morphos
 minix
 mx
 netbsd
@@ -59,8 +62,6 @@ solus
 solaris
 ubuntu
 void
+windows
 xeonix
-fiwix
-morphos
-amogos
 EOF

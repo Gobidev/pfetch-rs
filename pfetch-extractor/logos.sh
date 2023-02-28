@@ -58,6 +58,21 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Aa]mog[Oo][Ss]*)
+        read_ascii 4 <<- EOF
+				${c7}      -///:.
+				${c7}     smhhhhmh\`
+				${c7}    :NA${c4}mogO${c7}SNs
+				${c7}    hNNmmmmNNN
+				${c7}    NNNNNNNNNN
+				${c7}   :NNNNNNNNNN
+				${c7}   mNNssussNNN
+				${c7}  sNn:    sNNo
+				${c7}+ooo+     sNNo
+				${c7}        +oooo\`
+			EOF
+        ;;
+
     [Aa]rco*)
         read_ascii 4 <<- EOF
 				${c4}      /\\
@@ -234,6 +249,20 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 				${c4}|  ',_,'  |
 				${c4} '.     ,'
 				   ${c4}'''''
+			EOF
+        ;;
+
+    [Ff]iwix*)
+        read_ascii 12 <<- EOF
+				 ${c6}_____  ${c4}_____
+				 ${c6}\\    \\ ${c4}\\    \\
+				  ${c6}\\    \\ ${c4}\\    \\
+				 ${c6}/ \\    \\ ${c4}\\    \\
+				${c6}(   \\    \\ ${c4}\\    \\
+				${c6}(   /    / ${c4}/    /
+				 ${c6}\\ /    / ${c4}/    /
+				  ${c6}/    / ${c4}/    /
+				 ${c6}/____/ ${c4}/____/
 			EOF
         ;;
 
@@ -472,6 +501,17 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Mm]orph[Oo][Ss]*)
+        read_ascii 1 <<- EOF
+				${c4}  __ \/ __
+				${c4} /o \{}/ o\\
+				${c4} \   ()   /
+				${c4}  \`> /\ <\`
+				${c4}  (o/\/\o)
+				${c4}   )    (
+			EOF
+        ;;
+
     [Mm][Xx]*)
         read_ascii <<- EOF
 				${c7}    \\\\  /
@@ -689,43 +729,6 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 				${c2} \  \/    \/  /
 				${c2}  \    /\    /
 				${c2}   \__/  \__/
-			EOF
-        ;;
-    [Ff]iwix*)
-        read_ascii 12 <<- EOF
-				 ${c6}_____  ${c4}_____
-				 ${c6}\\    \\ ${c4}\\    \\
-				  ${c6}\\    \\ ${c4}\\    \\
-				 ${c6}/ \\    \\ ${c4}\\    \\
-				${c6}(   \\    \\ ${c4}\\    \\
-				${c6}(   /    / ${c4}/    /
-				 ${c6}\\ /    / ${c4}/    /
-				  ${c6}/    / ${c4}/    /
-				 ${c6}/____/ ${c4}/____/
-			EOF
-        ;;
-    [Mm]orph[Oo][Ss]*)
-        read_ascii 1 <<- EOF
-				${c4}  __ \/ __
-				${c4} /o \{}/ o\\
-				${c4} \   ()   /
-				${c4}  \`> /\ <\`
-				${c4}  (o/\/\o)
-				${c4}   )    (
-			EOF
-        ;;
-    [Aa]mog[Oo][Ss]*)
-        read_ascii 4 <<- EOF
-				${c7}      -///:.
-				${c7}     smhhhhmh\`
-				${c7}    :NA${c4}mogO${c7}SNs
-				${c7}    hNNmmmmNNN
-				${c7}    NNNNNNNNNN
-				${c7}   :NNNNNNNNNN
-				${c7}   mNNssussNNN
-				${c7}  sNn:    sNNo
-				${c7}+ooo+     sNNo
-				${c7}        +oooo\`
 			EOF
         ;;
 esac
