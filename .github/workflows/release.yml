@@ -77,8 +77,8 @@ jobs:
           - os: macos-latest
             name: macOS aarch64
             target: aarch64-apple-darwin
-            artifact_name: target/x86_64-apple-darwin/release/pfetch
-            release_name: pfetch-macos-x86_64
+            artifact_name: target/aarch64-apple-darwin/release/pfetch
+            release_name: pfetch-macos-aarch64
             cross: true
             strip: true
 
