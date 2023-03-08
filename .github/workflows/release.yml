@@ -70,10 +70,9 @@ jobs:
             target: x86_64-apple-darwin
             artifact_name: target/x86_64-apple-darwin/release/pfetch
             release_name: pfetch-macos-x86_64
-            cross: true
+            cross: false
             strip: true
-            
-            
+
           - os: macos-latest
             name: macOS aarch64
             target: aarch64-apple-darwin
