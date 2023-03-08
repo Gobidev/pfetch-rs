@@ -78,7 +78,7 @@ jobs:
             target: aarch64-apple-darwin
             artifact_name: target/aarch64-apple-darwin/release/pfetch
             release_name: pfetch-macos-aarch64
-            cross: true
+            cross: false
             strip: true
 
           - os: ubuntu-latest
