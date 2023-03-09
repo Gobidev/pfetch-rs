@@ -43,6 +43,7 @@ jobs:
           - x86_64-apple-darwin
           - x86_64-unknown-netbsd
           - x86_64-unknown-freebsd
+          - x86_64-pc-windows-gnu
           - aarch64-apple-darwin
           - aarch64-linux-android
           - aarch64-unknown-linux-musl
@@ -53,7 +54,7 @@ jobs:
             name: Linux GNU x86_64
             target: x86_64-unknown-linux-gnu
             artifact_name: target/x86_64-unknown-linux-gnu/release/pfetch
-            release_name: pfetch-linux-gnu-x86_64
+            release_name: pfetch-linux-gnu-x86_64.tar.gz
             cross: false
             strip: true
 
@@ -61,7 +62,7 @@ jobs:
             name: Linux musl x86_64
             target: x86_64-unknown-linux-musl
             artifact_name: target/x86_64-unknown-linux-musl/release/pfetch
-            release_name: pfetch-linux-musl-x86_64
+            release_name: pfetch-linux-musl-x86_64.tar.gz
             cross: true
             strip: true
 
@@ -69,7 +70,7 @@ jobs:
             name: macOS x86_64
             target: x86_64-apple-darwin
             artifact_name: target/x86_64-apple-darwin/release/pfetch
-            release_name: pfetch-macos-x86_64
+            release_name: pfetch-macos-x86_64.tar.gz
             cross: false
             strip: true
 
@@ -77,7 +78,7 @@ jobs:
             name: macOS aarch64
             target: aarch64-apple-darwin
             artifact_name: target/aarch64-apple-darwin/release/pfetch
-            release_name: pfetch-macos-aarch64
+            release_name: pfetch-macos-aarch64.tar.gz
             cross: false
             strip: true
 
@@ -85,7 +86,7 @@ jobs:
             name: NetBSD x86_64
             target: x86_64-unknown-netbsd
             artifact_name: target/x86_64-unknown-netbsd/release/pfetch
-            release_name: pfetch-netbsd-x86_64
+            release_name: pfetch-netbsd-x86_64.tar.gz
             cross: true
             strip: true
 
@@ -93,7 +94,7 @@ jobs:
             name: freeBSD x86_64
             target: x86_64-unknown-freebsd
             artifact_name: target/x86_64-unknown-freebsd/release/pfetch
-            release_name: pfetch-freebsd-x86_64
+            release_name: pfetch-freebsd-x86_64.tar.gz
             cross: true
             strip: true
 
@@ -101,7 +102,7 @@ jobs:
             name: Android
             target: aarch64-linux-android
             artifact_name: target/aarch64-linux-android/release/pfetch
-            release_name: pfetch-android-aarch64
+            release_name: pfetch-android-aarch64.tar.gz
             cross: true
             strip: true
 
@@ -109,7 +110,7 @@ jobs:
             name: Linux musl aarch64
             target: aarch64-unknown-linux-musl
             artifact_name: target/aarch64-unknown-linux-musl/release/pfetch
-            release_name: pfetch-linux-musl-aarch64
+            release_name: pfetch-linux-musl-aarch64.tar.gz
             cross: true
             strip: true
 
@@ -117,8 +118,16 @@ jobs:
             name: Linux ARMv7
             target: armv7-unknown-linux-gnueabihf
             artifact_name: target/armv7-unknown-linux-gnueabihf/release/pfetch
-            release_name: pfetch-linux-gnueabihf-armv7
+            release_name: pfetch-linux-gnueabihf-armv7.tar.gz
             cross: true
+            strip: true
+
+          - os: windows-latest
+            name: Windows x86_64
+            target: x86_64-pc-windows-gnu
+            artifact_name: target/x86_64-pc-windows-gnu/release/pfetch.exe
+            release_name: pfetch-windows-x86_64.exe
+            cross: false
             strip: true
     steps:
       - name: Checkout
@@ -138,12 +147,17 @@ jobs:
           use-cross: ${{ matrix.cross }}
 
       - name: Compress binaries
-        run: tar cfzv ${{ matrix.release_name }}.tar.gz -C "$(dirname ${{ matrix.artifact_name}})" "$(basename ${{ matrix.artifact_name }})"
+        run: if [ "$RUNNER_OS" != "Windows" ]; then
+            tar cfzv ${{ matrix.release_name }} -C "$(dirname ${{ matrix.artifact_name}})" "$(basename ${{ matrix.artifact_name }})";
+          else
+            mv ${{ matrix.artifact_name }} ${{ matrix.release_name }};
+          fi
+        shell: bash
 
       - name: Upload binaries
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.release_name }}.tar.gz
+          files: ${{ matrix.release_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
