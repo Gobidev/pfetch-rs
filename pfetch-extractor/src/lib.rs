@@ -4,7 +4,7 @@ use regex::Regex;
 
 #[proc_macro]
 pub fn parse_logos(_input: TokenStream) -> TokenStream {
-    let raw_logos = include_str!("../logos.sh");
+    let raw_logos = include_str!("../logos.sh").replace("\r\n", "\n");
     let raw_logos = raw_logos
         .split_once("in\n")
         .expect("Invalid logos.sh file")
