@@ -183,19 +183,10 @@ fn get_info(
                 .to_string(),
         ),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
-        PfetchInfo::Shell => match dotenvy::var("SHELL") {
-            Ok(shell) => Some(shell),
-            Err(_) => pfetch::shell(&readouts.general_readout),
-        },
-        PfetchInfo::Editor => match dotenvy::var("EDITOR") {
-            Ok(editor) => Some(editor),
-            Err(_) => pfetch::editor(),
-        },
+        PfetchInfo::Shell => pfetch::shell(&readouts.general_readout),
+        PfetchInfo::Editor => pfetch::editor(),
         PfetchInfo::Wm => pfetch::wm(&readouts.general_readout),
-        PfetchInfo::De => match dotenvy::var("XDG_CURRENT_DESKTOP") {
-            Ok(de) => Some(de),
-            Err(_) => pfetch::de(&readouts.general_readout),
-        },
+        PfetchInfo::De => pfetch::de(&readouts.general_readout),
         PfetchInfo::Palette => Some(pfetch::palette()),
         PfetchInfo::BlankLine => Some("".to_string()),
     }

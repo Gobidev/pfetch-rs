@@ -146,15 +146,6 @@ USER=""
 # Which hostname to display.
 HOSTNAME=""
 
-# Which editor to display.
-EDITOR=""
-
-# Which shell to display.
-SHELL=""
-
-# Which desktop environment to display.
-XDG_CURRENT_DESKTOP=""
-
 # Skip package managers that take "long" to query package count (like nix)
 PF_FAST_PKG_COUNT=1
 ```

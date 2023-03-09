@@ -356,7 +356,10 @@ pub fn shell(general_readout: &GeneralReadout) -> Option<String> {
         libmacchina::traits::ShellKind::Default,
     ) {
         Ok(shell) => Some(shell),
-        Err(_) => None,
+        Err(_) => match dotenvy::var("SHELL") {
+            Ok(shell) => Some(shell),
+            Err(_) => None,
+        },
     }
 }
 
@@ -380,7 +383,10 @@ pub fn wm(general_readout: &GeneralReadout) -> Option<String> {
 pub fn de(general_readout: &GeneralReadout) -> Option<String> {
     match general_readout.desktop_environment() {
         Ok(de) => Some(de),
-        Err(_) => None,
+        Err(_) => match dotenvy::var("XDG_CURRENT_DESKTOP") {
+            Ok(de) => Some(de),
+            Err(_) => None,
+        },
     }
 }
 
