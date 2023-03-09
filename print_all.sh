@@ -48,6 +48,7 @@ minix
 mx
 netbsd
 nixos
+nobara
 openbsd
 opensusetumbleweed
 opensuse

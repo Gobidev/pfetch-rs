@@ -17,10 +17,10 @@ Artix Linux, Bedrock Linux, Buildroot, CelOS, CentOS, Crystal Linux, dahliaOS,
 Debian, Devuan, DietPi _(new)_, DragonflyBSD, Elementary OS, EndeavourOS,
 Fedora, Fiwix _(new)_, FreeBSD, Garuda Linux, Gentoo Linux, Gnu, Guix, Haiku,
 HydroOS, Hyperbola, instantOS, IRIX, KDE neon, Linux Lite, Linux, Mint, macOS,
-Mageia, Manjaro, Minix, MorphOS _(new)_, MX Linux, NetBSD, NixOS, OpenBSD,
-openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Parabola, Pop!\_OS _(updated)_,
-PureOS, Raspbian, SerenityOS, Slackware, Solus, Solaris, Ubuntu, Void Linux,
-Windows _(new)_, Xeonix Linux
+Mageia, Manjaro, Minix, MorphOS _(new)_, MX Linux, NetBSD, NixOS, Nobara Project
+_(new)_, OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Parabola, Pop!\_OS
+_(updated)_, PureOS, Raspbian, SerenityOS, Slackware, Solus, Solaris, Ubuntu,
+Void Linux, Windows _(new)_, Xeonix Linux
 
 For all other distributions, a penguin will be displayed.
 
