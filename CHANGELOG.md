@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.2.0] - 2023-03-09
+
+### Bug Fixes
+
+- Fix `invalid logos.sh file` error when building on Windows
+
+### Features
+
+- Add Nobara Project logo
+
+### Miscellaneous
+
+- Update dependencies
+
+### Performance
+
+- Prefer libmacchina readouts over dotenvy
+
+### Ci
+
+- Add macOS aarch64 release binary (#13)
+- Add Windows x86_64 release binary
+
 ## [2.1.0] - 2023-02-28
 
 ### Bug Fixes
