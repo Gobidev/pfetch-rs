@@ -47,6 +47,12 @@ Download a binary from the
 cargo install pfetch
 ```
 
+### Homebrew
+
+```sh
+brew install pfetch-rs
+```
+
 ### AUR
 
 Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) or
