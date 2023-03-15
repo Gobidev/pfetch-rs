@@ -260,10 +260,10 @@ fn main() {
         }
     }
 
-    if dotenvy::var("PF_TITLECOLOR").unwrap_or_default() == "0" {
-        logo.secondary_color = logo.primary_color;
-    } else if let Ok(newcolor) = dotenvy::var("PF_COL3") {
-        if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
+    if let Ok(newcolor) = dotenvy::var("PF_COL3") {
+        if newcolor == "COL1" {
+            logo.secondary_color = logo.primary_color;
+        } else if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
             logo.secondary_color = newcolor;
         }
     }
