@@ -120,7 +120,7 @@ PF_COL2=9
 
 # Color of title data:
 # Default: unset (auto)
-# Valid: 0-9
+# Valid: 0-9, COL1 (copies COL1 value)
 PF_COL3=1
 
 # Alignment paddings (this is different to the original version).
