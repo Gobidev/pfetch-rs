@@ -142,7 +142,16 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
             .map(|chunk| chunk.chars().skip(3).collect::<String>())
             .collect();
     }
+
+    // disable line wrap
+    crossterm::execute!(std::io::stdout(), crossterm::terminal::DisableLineWrap)
+        .unwrap_or_default();
+
     println!("{pfetch_str}");
+
+    // enable line wrap
+    crossterm::execute!(std::io::stdout(), crossterm::terminal::EnableLineWrap)
+        .unwrap_or_default();
 }
 
 struct Readouts {
