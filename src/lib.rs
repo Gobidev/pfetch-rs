@@ -219,10 +219,20 @@ pub fn memory(memory_readout: &MemoryReadout) -> Option<String> {
 
 pub fn os(general_readout: &GeneralReadout) -> Option<String> {
     match env::consts::OS {
-        "linux" => match general_readout.distribution() {
-            Ok(distribution) => Some(distribution),
-            Err(_) => None,
-        },
+        "linux" => {
+            // check for Bedrock Linux
+            if dotenvy::var("PATH")
+                .unwrap_or_default()
+                .contains("/bedrock/cross/")
+            {
+                Some("Bedrock Linux".to_string())
+            } else {
+                match general_readout.distribution() {
+                    Ok(distribution) => Some(distribution),
+                    Err(_) => None,
+                }
+            }
+        }
         _ => match general_readout.os_name() {
             Ok(os) => Some(os),
             Err(_) => None,
