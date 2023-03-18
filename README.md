@@ -18,9 +18,9 @@ Debian, Devuan, DietPi _(new)_, DragonflyBSD, Elementary OS, EndeavourOS,
 Fedora, Fiwix _(new)_, FreeBSD, Garuda Linux, Gentoo Linux, Gnu, Guix, Haiku,
 HydroOS, Hyperbola, instantOS, IRIX, KDE neon, Linux Lite, Linux, Mint, macOS,
 Mageia, Manjaro, Minix, MorphOS _(new)_, MX Linux, NetBSD, NixOS, Nobara Project
-_(new)_, OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Parabola, Pop!\_OS
-_(updated)_, PureOS, Raspbian, SerenityOS, Slackware, Solus, Solaris, Ubuntu,
-Void Linux, Windows _(new)_, Xeonix Linux
+_(new)_, OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Parabola,
+Pop!\_OS _(updated)_, PureOS, Raspbian, SerenityOS, Slackware, Solus, Solaris,
+Ubuntu, Void Linux, Windows _(new)_, Xeonix Linux
 
 For all other distributions, a penguin will be displayed.
 
@@ -59,15 +59,15 @@ Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
 
 |  Implementation   | Mean [ms]  | Min [ms] | Max [ms] |
 | :---------------: | :--------: | :------: | :------: |
-| POSIX `sh` (bash) | 27.3 ± 0.9 |   25.3   |   23.2   |
-| POSIX `sh` (dash) | 19.3 ± 0.6 |   18.3   |   24.0   |
-|       Rust        | 2.1 ± 0.2  |   1.8    |   3.6    |
+| POSIX `sh` (bash) | 23.7 ± 0.9 |   22.3   |   29.3   |
+| POSIX `sh` (dash) | 15.9 ± 0.3 |   15.1   |   18.2   |
+|   Rust (v2.3.0)   | 2.2 ± 0.2  |   1.8    |   3.9    |
 
-_Note: This is with `pacman` being the only installed package manager.
-Especially having `nix` installed will have a big impact on performance, as
-querying installed `nix` packages is very costly. If you want to skip slow
-package managers from being counted, you can set the `PF_FAST_PKG_COUNT`
-environment variable._
+_Note: This is with `pacman` and `flatpak` being the only installed package
+managers. Especially having `nix` installed will have a big impact on
+performance, as querying installed `nix` packages is very costly. If you want to
+skip slow package managers from being counted, you can set the
+`PF_FAST_PKG_COUNT` environment variable._
 
 ## Configuration
 
