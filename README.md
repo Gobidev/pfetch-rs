@@ -46,8 +46,6 @@ Download a binary from the
 cargo install pfetch
 ```
 
-please note you need to have gcc installed if on a barebones Linux machine.
-
 ### Homebrew
 
 ```sh
