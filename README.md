@@ -42,9 +42,14 @@ Download a binary from the
 [latest release](https://github.com/Gobidev/pfetch-rs/releases/latest).
 
 ### Cargo
-
 ```sh
 cargo install pfetch
+```
+
+### Homebrew
+
+```sh
+brew install pfetch-rs
 ```
 
 ### AUR
