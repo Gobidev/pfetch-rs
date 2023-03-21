@@ -142,7 +142,16 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
             .map(|chunk| chunk.chars().skip(3).collect::<String>())
             .collect();
     }
+
+    // disable line wrap
+    crossterm::execute!(std::io::stdout(), crossterm::terminal::DisableLineWrap)
+        .unwrap_or_default();
+
     println!("{pfetch_str}");
+
+    // enable line wrap
+    crossterm::execute!(std::io::stdout(), crossterm::terminal::EnableLineWrap)
+        .unwrap_or_default();
 }
 
 struct Readouts {
@@ -261,7 +270,9 @@ fn main() {
     }
 
     if let Ok(newcolor) = dotenvy::var("PF_COL3") {
-        if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
+        if newcolor == "COL1" {
+            logo.secondary_color = logo.primary_color;
+        } else if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
             logo.secondary_color = newcolor;
         }
     }

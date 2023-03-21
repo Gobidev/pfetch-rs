@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.0] - 2023-03-16
+
+### Bug Fixes
+
+- Fix Bedrock Linux not being detected
+- Disable line wrap for pfetch output
+
+### Features
+
+- Add option to set title color to info name color (#15)
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [2.2.0] - 2023-03-09
 
 ### Bug Fixes

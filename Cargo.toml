@@ -3,7 +3,7 @@ members = ["pfetch-extractor"]
 
 [package]
 name = "pfetch"
-version = "2.2.0"
+version = "2.3.0"
 edition = "2021"
 authors = ["Gobidev"]
 description = "A rewrite of the pfetch system information tool"
@@ -21,6 +21,7 @@ dotenvy = "0.15.6"
 glob = "0.3.1"
 which = "4.4.0"
 libmacchina = "6"
+crossterm = "0.26.1"
 
 [profile.release]
 strip = true

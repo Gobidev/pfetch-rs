@@ -60,6 +60,7 @@ raspbian
 serenityos
 slackware
 solus
+steamos
 solaris
 ubuntu
 void
