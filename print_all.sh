@@ -63,6 +63,7 @@ solus
 steamos
 solaris
 ubuntu
+vanilla
 void
 windows
 xeonix
