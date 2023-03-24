@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.4.0] - 2023-03-24
+
+### Documentation
+
+- Update benchmark table content in README
+- Add homebrew installation instructions (#20)
+
+### Features
+
+- Add SteamOS logo
+- Add Vanilla OS logo (#22)
+- Finish FreeBSD and Android support (libmacchina 6.4.0)
+
+### Miscellaneous
+
+- Update dependencies
+
+### Ci
+
+- Add more targets to the check workflow
+
 ## [2.3.0] - 2023-03-16
 
 ### Bug Fixes
