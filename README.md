@@ -30,11 +30,6 @@ _Credit to [the original pfetch](https://github.com/dylanaraps/pfetch) and
 
 If you want to add a logo, feel free to make a Pull Request.
 
-## Status
-
-This project is still in early development, expect things to not work properly.
-Please open issues for bugs you are encountering.
-
 ## Installation
 
 ### Binary
