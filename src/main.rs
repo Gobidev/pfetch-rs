@@ -202,6 +202,12 @@ fn get_info(
 }
 
 fn main() {
+    // parse arguements
+    if std::env::args().any(|arg| arg.starts_with("-v") || arg.starts_with("--v")) {
+        println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
+        std::process::exit(0);
+    }
+
     // source file specified by env: PF_SOURCE
     if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
         dotenvy::from_path(filepath).unwrap();
