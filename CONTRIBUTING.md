@@ -18,6 +18,8 @@ Adding a distribution is almost as easy as updating the icon. You need to do the
 - Add your icon to the README using the following format, "disto_name *(new)*"
 
 # Bugs and bug fixes
-This repository's main dependency is [libmacchima](https://github.com/Macchina-CLI/libmacchina), many of the issues we have ran into have been related to this. If you find that your issue is related to libmacchina please don't hesitate to add an issue there as well as add a PR if possible.
+This repository's main dependency is [libmacchima](https://github.com/Macchina-CLI/libmacchina), many of the issues we have ran into have been related to this. If you find that your issue is related to libmacchina please don't hesitate to add an issue there as well as here. 
 
-However if the issue is in fact related to us, feel free to add your issue and PR. Please make sure it works locally first.
+In any case always add an issue in our repo, with enough instructions and details to make us able to recreate the problem. :)
+
+### Good luck and thank you for wanting to make this project better
