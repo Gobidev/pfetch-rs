@@ -228,7 +228,7 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
                 Some("Bedrock Linux".to_string())
             } else {
                 match general_readout.distribution() {
-                    Ok(distribution) => Some(distribution),
+                    Ok(distribution) => Some(distribution.replace(" TEMPLATE_VERSION_ID", "")),
                     Err(_) => None,
                 }
             }
