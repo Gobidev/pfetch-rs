@@ -206,6 +206,10 @@ fn main() {
     if std::env::args().any(|arg| arg.starts_with("-v") || arg.starts_with("--v")) {
         println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
         std::process::exit(0);
+    } else if std::env::args().len() > 1 {
+        println!("pfetch     show system information");
+        println!("pfetch -v  show version");
+        std::process::exit(0);
     }
 
     // source file specified by env: PF_SOURCE
