@@ -20,7 +20,7 @@ globset = "0.4.10"
 dotenvy = "0.15.6"
 glob = "0.3.1"
 which = "4.4.0"
-libmacchina = "6"
+libmacchina = "7"
 crossterm = "0.26.1"
 
 [profile.release]
