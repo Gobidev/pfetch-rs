@@ -214,7 +214,7 @@ fn main() {
 
     // source file specified by env: PF_SOURCE
     if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
-        dotenvy::from_path(filepath).unwrap();
+        let _ = dotenvy::from_path(filepath);
     }
     // Check if SKIP_SLOW is enabled
     let skip_slow_package_managers = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
