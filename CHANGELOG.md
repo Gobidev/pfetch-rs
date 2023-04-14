@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.5.0] - 2023-04-14
+
+### Bug Fixes
+
+- Never show `TEMPLATE_VERSION_ID` in os name
+- Fix panic when file specified in `PF_SOURCE` does not exist
+
+### Documentation
+
+- Rewrite notice on slow package counts in README
+
+### Features
+
+- Add help menu and `-v` argument to show version (#24)
+- Add alternative `rpm` package count method (for OpenSUSE)
+
+### Miscellaneous
+
+- Bump libmacchina to version 7.0.0
+- Update dependencies
+
 ## [2.4.0] - 2023-03-24
 
 ### Documentation
