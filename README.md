@@ -66,10 +66,18 @@ Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
 |   Rust (v2.3.0)   | 2.2 ± 0.2  |   1.8    |   3.9    |
 
 _Note: This is with `pacman` and `flatpak` being the only installed package
-managers. Especially having `nix` installed will have a big impact on
-performance, as querying installed `nix` packages is very costly. If you want to
-skip slow package managers from being counted, you can set the
-`PF_FAST_PKG_COUNT` environment variable._
+managers. For more info, see [Improving Performance](#imp_perf)._
+
+<a name="imp_perf"></a>
+
+### Improving Performance
+
+The by far slowest part of the `pfetch` execution time is counting the installed
+packages. For most package managers this is still very fast, but there are some
+(currently `nix` and `zypper`) that take ~500ms to report installed packages,
+which takes away all performance benefits of the Rust version. If you have one
+or more of these installed, you can skip counting them by setting the
+`PF_FAST_PKG_COUNT` environment variable.
 
 ## Configuration
 
