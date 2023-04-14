@@ -123,13 +123,27 @@ fn packages(
         | PackageManager::Dpkg
         | PackageManager::Xbps
         | PackageManager::Apk
-        | PackageManager::Rpm
         | PackageManager::Portage
         | PackageManager::Opkg => get_macchina_package_count(
             macchina_package_count,
             &format!("{pkg_manager:?}").to_lowercase(),
         )
         .unwrap_or(0),
+        // macchina only supports sqlite database backend for rpm
+        PackageManager::Rpm => match get_macchina_package_count(
+            macchina_package_count,
+            &format!("{pkg_manager:?}").to_lowercase(),
+        ) {
+            Some(count) => count,
+            // for other databases run `rpm` (slow), see Macchina-CLI/libmacchina#154
+            None => {
+                if !skip_slow {
+                    run_and_count_lines("rpm", &["-qa"])
+                } else {
+                    0
+                }
+            }
+        },
         PackageManager::Guix => run_and_count_lines("guix", &["package", "--list-installed"]),
         PackageManager::Crux => {
             if check_if_command_exists("crux") {
@@ -158,7 +172,6 @@ fn packages(
                 0
             }
         }
-        // TODO: nix -q is very slow
         PackageManager::Nix => {
             if check_if_command_exists("nix-store") && !skip_slow {
                 run_and_count_lines(
