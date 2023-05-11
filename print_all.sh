@@ -57,6 +57,7 @@ parabola
 pop!_os
 pureos
 raspbian
+rocky
 serenityos
 slackware
 solus
