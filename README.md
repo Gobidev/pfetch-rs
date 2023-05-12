@@ -12,23 +12,23 @@ minimalistic look.
 
 **Supported Platforms:** Linux, Android, macOS, Windows, FreeBSD, NetBSD
 
-**Included Logos:** Alpine Linux, Android, AmogOS _(new)_, Arch Linux,
-ArcoLinux, Artix Linux, Bedrock Linux, Buildroot, CelOS, CentOS, Crystal Linux,
-dahliaOS, Debian, Devuan, DietPi _(new)_, DragonflyBSD, Elementary OS,
-EndeavourOS, Fedora, Fiwix _(new)_, FreeBSD, Garuda Linux, Gentoo Linux, Gnu,
-Guix, Haiku, HydroOS, Hyperbola, instantOS, IRIX, KDE neon, Linux Lite, Linux,
-Mint, macOS, Mageia, Manjaro, Minix, MorphOS _(new)_, MX Linux, NetBSD, NixOS,
-Nobara Project _(new)_, OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt,
-Parabola, Pop!\_OS _(updated)_, PureOS, Raspbian, Rocky Linux _(new)_,
-SerenityOS, Slackware, Solus, SteamOS _(new)_, Solaris, Ubuntu, Vanilla OS
-_(new)_, Void Linux, Windows _(new)_, Xeonix Linux
+**Included Logos:** Alma Linux _(new)_, Alpine Linux, Android, AmogOS _(new)_,
+Arch Linux, ArcoLinux, Artix Linux, Bedrock Linux, Buildroot, CelOS, CentOS,
+Crystal Linux, dahliaOS, Debian, Devuan, DietPi _(new)_, DragonflyBSD,
+Elementary OS, EndeavourOS, Fedora, Fiwix _(new)_, FreeBSD, Garuda Linux, Gentoo
+Linux, Gnu, Guix, Haiku, HydroOS, Hyperbola, instantOS, IRIX, KDE neon, Linux
+Lite, Linux, Mint, macOS, Mageia, Manjaro, Minix, MorphOS _(new)_, MX Linux,
+NetBSD, NixOS, Nobara Project _(new)_, OpenBSD, openSUSE Tumbleweed, openSUSE
+Leap, OpenWrt, Parabola, Pop!\_OS _(updated)_, PureOS, Raspbian, Rocky Linux
+_(new)_, SerenityOS, Slackware, Solus, SteamOS _(new)_, Solaris, Ubuntu, Vanilla
+OS _(new)_, Void Linux, Windows _(new)_, Xeonix Linux
 
 For all other distributions, a penguin will be displayed.
 
 _Credit to [the original pfetch](https://github.com/dylanaraps/pfetch) and
 [its contributors](https://github.com/dylanaraps/pfetch/graphs/contributors)._
 
-If you want to add a logo, feel free to make a Pull Request.
+If you want a logo to be added, feel free to open an issue or a PR.
 
 ## Installation
 

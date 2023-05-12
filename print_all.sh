@@ -5,6 +5,7 @@
 while read -r logo; do
     PF_ASCII=$logo "$@"
 done << EOF
+alma
 alpine
 android
 amogos
