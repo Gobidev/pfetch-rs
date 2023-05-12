@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.6.0] - 2023-05-12
+
+### Features
+
+- Add Rocky Linux logo
+- Add Alma Linux logo
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [2.5.0] - 2023-04-14
 
 ### Bug Fixes
