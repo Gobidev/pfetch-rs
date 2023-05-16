@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1] - 2023-05-16
+
+### Miscellaneous
+
+- Fast RPM package count on openSUSE (libmacchina 7.1.0)
+- Update dependencies
+
 ## [2.6.0] - 2023-05-12
 
 ### Features
