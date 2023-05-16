@@ -32,6 +32,8 @@ If you want a logo to be added, feel free to open an issue or a PR.
 
 ## Installation
 
+_Note: On openSUSE, install the `rpm-devel` package for faster package count._
+
 ### Binary
 
 Download a binary from the
@@ -74,10 +76,11 @@ managers. For more info, see [Improving Performance](#imp_perf)._
 
 The by far slowest part of the `pfetch` execution time is counting the installed
 packages. For most package managers this is still very fast, but there are some
-(currently `nix` and `zypper`) that take ~500ms to report installed packages,
-which takes away all performance benefits of the Rust version. If you have one
-or more of these installed, you can skip counting them by setting the
-`PF_FAST_PKG_COUNT` environment variable.
+(currently `nix` (and `zypper`, if `rpm-devel` is not installed)) that take
+~500ms to report installed packages, which takes away all performance benefits
+of the Rust version. If you have one or more of these installed, you can skip
+counting them by setting the `PF_FAST_PKG_COUNT` environment variable to any
+value.
 
 ## Configuration
 
