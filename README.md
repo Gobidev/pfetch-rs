@@ -97,7 +97,7 @@ make your changes to `./pfetch-extractor/logos.sh` and build the binary with
 # Default: first example below
 # Valid: space separated string
 #
-# OFF by default: shell editor wm de palette
+# OFF by default: shell editor wm de palette cpu
 PF_INFO="ascii title os host kernel uptime pkgs memory"
 
 # Example: Only ASCII.

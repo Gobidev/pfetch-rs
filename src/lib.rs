@@ -230,6 +230,10 @@ pub fn memory(memory_readout: &MemoryReadout) -> Option<String> {
     }
 }
 
+pub fn cpu(general_readout: &GeneralReadout) -> Option<String> {
+    general_readout.cpu_model_name().ok()
+}
+
 pub fn os(general_readout: &GeneralReadout) -> Option<String> {
     match env::consts::OS {
         "linux" => {

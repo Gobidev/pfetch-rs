@@ -13,6 +13,7 @@ enum PfetchInfo {
     Kernel,
     Uptime,
     Pkgs,
+    Cpu,
     Memory,
     Shell,
     Editor,
@@ -40,6 +41,7 @@ impl FromStr for PfetchInfo {
             "kernel" => Ok(PfetchInfo::Kernel),
             "uptime" => Ok(PfetchInfo::Uptime),
             "pkgs" => Ok(PfetchInfo::Pkgs),
+            "cpu" => Ok(PfetchInfo::Cpu),
             "memory" => Ok(PfetchInfo::Memory),
             "shell" => Ok(PfetchInfo::Shell),
             "editor" => Ok(PfetchInfo::Editor),
@@ -180,6 +182,7 @@ fn get_info(
             pfetch::total_packages(&readouts.package_readout, skip_slow_package_managers)
                 .to_string(),
         ),
+        PfetchInfo::Cpu => pfetch::cpu(&readouts.general_readout),
         PfetchInfo::Memory => pfetch::memory(&readouts.memory_readout),
         PfetchInfo::Shell => pfetch::shell(&readouts.general_readout),
         PfetchInfo::Editor => pfetch::editor(),
