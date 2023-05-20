@@ -150,8 +150,7 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
     println!("{pfetch_str}");
 
     // enable line wrap
-    crossterm::execute!(std::io::stdout(), crossterm::terminal::EnableLineWrap)
-        .unwrap_or_default();
+    crossterm::execute!(std::io::stdout(), crossterm::terminal::EnableLineWrap).unwrap_or_default();
 }
 
 struct Readouts {
@@ -168,21 +167,11 @@ fn get_info(
 ) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
-        PfetchInfo::Title => {
-            let hostname_override = match dotenvy::var("HOSTNAME") {
-                Ok(hostname) => Some(hostname),
-                Err(_) => None,
-            };
-            let username_override = match dotenvy::var("USER") {
-                Ok(username) => Some(username),
-                Err(_) => None,
-            };
-            pfetch::user_at_hostname(
-                &readouts.general_readout,
-                &username_override,
-                &hostname_override,
-            )
-        }
+        PfetchInfo::Title => pfetch::user_at_hostname(
+            &readouts.general_readout,
+            &dotenvy::var("USER").ok(),
+            &dotenvy::var("HOSTNAME").ok(),
+        ),
         PfetchInfo::Os => pfetch::os(&readouts.general_readout),
         PfetchInfo::Host => pfetch::host(&readouts.general_readout),
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
@@ -291,20 +280,12 @@ fn main() {
         .iter()
         .filter_map(|info| match info {
             PfetchInfo::Os => Some((logo.primary_color, info.to_string(), os.clone())),
-            _ => {
-                let info_result = get_info(info, &readouts, skip_slow_package_managers);
-                match info_result {
-                    Some(info_str) => match info {
-                        PfetchInfo::Title => Some((logo.secondary_color, info_str, "".to_string())),
-                        PfetchInfo::BlankLine => {
-                            Some((logo.primary_color, "".to_string(), "".to_string()))
-                        }
-                        PfetchInfo::Palette => Some((logo.primary_color, info_str, "".to_string())),
-                        _ => Some((logo.primary_color, info.to_string(), info_str)),
-                    },
-                    None => None,
-                }
-            }
+            _ => get_info(info, &readouts, skip_slow_package_managers).map(|info_str| match info {
+                PfetchInfo::Title => (logo.secondary_color, info_str, "".to_string()),
+                PfetchInfo::BlankLine => (logo.primary_color, "".to_string(), "".to_string()),
+                PfetchInfo::Palette => (logo.primary_color, info_str, "".to_string()),
+                _ => (logo.primary_color, info.to_string(), info_str),
+            }),
         })
         .collect();
 

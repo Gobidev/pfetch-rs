@@ -246,18 +246,12 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
                 }
             }
         }
-        _ => match general_readout.os_name() {
-            Ok(os) => Some(os),
-            Err(_) => None,
-        },
+        _ => general_readout.os_name().ok(),
     }
 }
 
 pub fn kernel(kernel_readout: &KernelReadout) -> Option<String> {
-    match kernel_readout.os_release() {
-        Ok(kernel_version) => Some(kernel_version),
-        Err(_) => None,
-    }
+    kernel_readout.os_release().ok()
 }
 
 fn seconds_to_string(time: usize) -> String {
@@ -283,10 +277,7 @@ fn seconds_to_string(time: usize) -> String {
 }
 
 pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
-    match general_readout.uptime() {
-        Ok(uptime) => Some(seconds_to_string(uptime)),
-        Err(_) => None,
-    }
+    Some(seconds_to_string(general_readout.uptime().ok()?))
 }
 
 pub fn host(general_readout: &GeneralReadout) -> Option<String> {
@@ -348,13 +339,11 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
                 Some(final_str)
             }
         }
-        _ => match general_readout.machine() {
-            Ok(host) => Some(host),
-            Err(_) => match general_readout.cpu_model_name() {
-                Ok(host) => Some(host),
-                Err(_) => None,
-            },
-        },
+        // on non-linux systems, try general_readout.machine(), use cpu model name as fallback
+        _ => general_readout
+            .machine()
+            .ok()
+            .or_else(|| general_readout.cpu_model_name().ok()),
     }
 }
 
@@ -374,43 +363,31 @@ pub fn logo(logo_name: &str) -> Logo {
 }
 
 pub fn shell(general_readout: &GeneralReadout) -> Option<String> {
-    match general_readout.shell(
-        libmacchina::traits::ShellFormat::Relative,
-        libmacchina::traits::ShellKind::Default,
-    ) {
-        Ok(shell) => Some(shell),
-        Err(_) => match dotenvy::var("SHELL") {
-            Ok(shell) => Some(shell),
-            Err(_) => None,
-        },
-    }
+    general_readout
+        .shell(
+            libmacchina::traits::ShellFormat::Relative,
+            libmacchina::traits::ShellKind::Default,
+        )
+        .ok()
+        .or_else(|| dotenvy::var("SHELL").ok())
 }
 
 pub fn editor() -> Option<String> {
-    match env::var("VISUAL") {
-        Ok(editor) => Some(editor.trim().to_owned()),
-        Err(_) => match env::var("EDITOR") {
-            Ok(editor) => Some(editor.trim().to_owned()),
-            Err(_) => None,
-        },
-    }
+    env::var("VISUAL")
+        .or_else(|_| env::var("EDITOR"))
+        .ok()
+        .map(|editor| editor.trim().to_owned())
 }
 
 pub fn wm(general_readout: &GeneralReadout) -> Option<String> {
-    match general_readout.window_manager() {
-        Ok(wm) => Some(wm),
-        Err(_) => None,
-    }
+    general_readout.window_manager().ok()
 }
 
 pub fn de(general_readout: &GeneralReadout) -> Option<String> {
-    match general_readout.desktop_environment() {
-        Ok(de) => Some(de),
-        Err(_) => match dotenvy::var("XDG_CURRENT_DESKTOP") {
-            Ok(de) => Some(de),
-            Err(_) => None,
-        },
-    }
+    general_readout
+        .desktop_environment()
+        .ok()
+        .or_else(|| dotenvy::var("XDG_CURRENT_DESKTOP").ok())
 }
 
 pub fn palette() -> String {
