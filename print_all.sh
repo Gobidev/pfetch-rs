@@ -54,6 +54,7 @@ openbsd
 opensusetumbleweed
 opensuse
 openwrt
+oracle
 parabola
 pop!_os
 pureos
