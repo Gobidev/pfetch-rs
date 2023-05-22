@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.7.0] - 2023-05-22
+
+### Features
+
+- Add cpu name info option
+- Add Oracle Linux logo
+
+### Miscellaneous
+
+- Update dependencies
+
+### Refactor
+
+- Simplify code with `.ok()`
+
 ## [2.6.1] - 2023-05-16
 
 ### Miscellaneous

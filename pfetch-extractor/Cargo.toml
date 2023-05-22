@@ -1,6 +1,6 @@
 [package]
 name = "pfetch-extractor"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 authors = ["Gobidev"]
 description = "A rust proc-macro to extract pfetch logos at compile time"
