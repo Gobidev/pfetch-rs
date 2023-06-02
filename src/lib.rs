@@ -14,6 +14,7 @@ pub struct Color(pub Option<u8>);
 impl Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.0 {
+            Some(color @ 0..=7) => write!(f, "\x1b[3{color}m"),
             Some(color) => write!(f, "\x1b[38;5;{color}m"),
             None => write!(f, "\x1b[39m"),
         }
