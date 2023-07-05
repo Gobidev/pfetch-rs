@@ -1,4 +1,4 @@
-use std::{env, fmt::Display, fs, io::Result, process::Command, str::FromStr};
+use std::{env, fs, io::Result, process::Command};
 
 use glob::glob;
 use globset::Glob;
@@ -6,48 +6,7 @@ use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
     traits::PackageReadout as _, GeneralReadout, KernelReadout, MemoryReadout, PackageReadout,
 };
-use pfetch_extractor::parse_logos;
-
-#[derive(Clone, Copy, Debug)]
-pub struct Color(pub Option<u8>);
-
-impl Display for Color {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.0 {
-            Some(color @ 0..=7) => write!(f, "\x1b[3{color}m"),
-            Some(color) => write!(f, "\x1b[38;5;{color}m"),
-            None => write!(f, "\x1b[39m"),
-        }
-    }
-}
-
-impl FromStr for Color {
-    type Err = String;
-
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Ok(Color(s.parse::<u8>().ok()))
-    }
-}
-
-pub struct Logo {
-    pub primary_color: Color,
-    pub secondary_color: Color,
-    pub pattern: &'static str,
-    pub logo_parts: &'static [(Color, &'static str)],
-}
-
-impl Display for Logo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.logo_parts
-                .iter()
-                .map(|(color, part)| format!("{color}{part}"))
-                .collect::<String>()
-        )
-    }
-}
+use pfetch_logo_parser::Logo;
 
 #[derive(Debug)]
 pub enum PackageManager {
@@ -353,7 +312,7 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
 }
 
 pub fn logo(logo_name: &str) -> Logo {
-    let (tux, logos) = parse_logos!();
+    let (tux, logos) = pfetch_extractor::parse_logos!();
     logos
         .into_iter()
         .find(|logo| {

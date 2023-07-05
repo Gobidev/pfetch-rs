@@ -1,11 +1,11 @@
 [package]
 name = "pfetch-extractor"
 version = "0.1.5"
-edition = "2021"
 authors = ["Gobidev"]
-description = "A rust proc-macro to extract pfetch logos at compile time"
-license = "MIT"
+edition = "2021"
 keywords = ["pfetch"]
+license = "MIT"
+description = "A rust proc-macro to extract pfetch logos at compile time"
 
 [lib]
 proc-macro = true
@@ -13,6 +13,6 @@ proc-macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+pfetch-logo-parser = { version = "0.1.0", path = "../pfetch-logo-parser", features = ["proc-macro"] }
 proc-macro2 = "1.0.50"
 quote = "1.0.23"
-regex = "1.7.1"

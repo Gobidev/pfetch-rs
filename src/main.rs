@@ -2,6 +2,7 @@ use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
     traits::PackageReadout as _, GeneralReadout, KernelReadout, MemoryReadout, PackageReadout,
 };
+use pfetch_logo_parser::{Color, Logo, LogoPart};
 use std::{env, fmt::Display, str::FromStr};
 
 #[derive(Debug, PartialEq)]
@@ -53,11 +54,11 @@ impl FromStr for PfetchInfo {
     }
 }
 
-fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_enabled: bool) {
+fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
     let raw_logo = if logo_enabled {
         logo.logo_parts
             .iter()
-            .map(|(_, part)| *part)
+            .map(|LogoPart { content, .. }| content.as_ref())
             .collect::<String>()
     } else {
         "".to_string()
@@ -126,7 +127,7 @@ fn pfetch(info: Vec<(pfetch::Color, String, String)>, logo: pfetch::Logo, logo_e
             ),
             color2 = match dotenvy::var("PF_COL2") {
                 Ok(newcolor) => {
-                    match pfetch::Color::from_str(&newcolor) {
+                    match Color::from_str(&newcolor) {
                         Ok(newcolor) => format!("{newcolor}"),
                         Err(_) => "".to_string(),
                     }
@@ -266,7 +267,7 @@ fn main() {
 
     // color overrides
     if let Ok(newcolor) = dotenvy::var("PF_COL1") {
-        if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
+        if let Ok(newcolor) = Color::from_str(&newcolor) {
             logo.primary_color = newcolor;
         }
     }
@@ -274,12 +275,12 @@ fn main() {
     if let Ok(newcolor) = dotenvy::var("PF_COL3") {
         if newcolor == "COL1" {
             logo.secondary_color = logo.primary_color;
-        } else if let Ok(newcolor) = pfetch::Color::from_str(&newcolor) {
+        } else if let Ok(newcolor) = Color::from_str(&newcolor) {
             logo.secondary_color = newcolor;
         }
     }
 
-    let gathered_pfetch_info: Vec<(pfetch::Color, String, String)> = enabled_pf_info
+    let gathered_pfetch_info: Vec<(Color, String, String)> = enabled_pf_info
         .iter()
         .filter_map(|info| match info {
             PfetchInfo::Os => Some((logo.primary_color, info.to_string(), os.clone())),
