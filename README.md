@@ -51,6 +51,10 @@ cargo install pfetch
 brew install pfetch-rs
 ```
 
+### Nixpkgs
+
+Install the [pfetch-rs](https://search.nixos.org/packages?channel=unstable&show=pfetch-rs) Nix package.
+
 ### AUR
 
 Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) or
@@ -59,7 +63,7 @@ Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) or
 ## Performance
 
 Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
-[hyperfine](https://github.com/sharkdp/hyperfine) with `-w 4 -m 500 -N` flags
+[hyperfine](https://github.com/sharkdp/hyperfine) with `-w 4 -m 500 -N` flags.
 
 |  Implementation   | Mean [ms]  | Min [ms] | Max [ms] |
 | :---------------: | :--------: | :------: | :------: |
