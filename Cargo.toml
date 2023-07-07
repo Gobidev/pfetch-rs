@@ -1,5 +1,5 @@
 [workspace]
-members = ["pfetch-extractor"]
+members = ["pfetch-extractor", "pfetch-logo-parser"]
 
 [package]
 name = "pfetch"
@@ -15,6 +15,7 @@ categories = ["command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+pfetch-logo-parser = { path = "./pfetch-logo-parser", version = "0.1.0" }
 pfetch-extractor = { path = "./pfetch-extractor", version = "0.1.5" }
 globset = "0.4.10"
 dotenvy = "0.15.6"

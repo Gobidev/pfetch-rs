@@ -1,0 +1,17 @@
+[package]
+name = "pfetch-logo-parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Gobidev"]
+license = "MIT"
+description = "A parser for pfetch logos"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+proc-macro = ["dep:proc-macro2", "dep:quote"]
+
+[dependencies]
+regex = "1.8.4"
+proc-macro2 = { version = "1.0.50", optional = true }
+quote = { version = "1.0.23", optional = true }
