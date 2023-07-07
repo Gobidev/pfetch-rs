@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.8.0] - 2023-07-07
+
+### Bug Fixes
+
+- Use short forms for colors below 8 (#31)
+
+### Documentation
+
+- Add nixpkgs installation instructions
+
+### Features
+
+- Add support for custom logos at runtime
+
+### Miscellaneous
+
+- Update dependencies
+
+### Refactor
+
+- Outsource pfetch logo parser code to separate crate
+
 ## [2.7.0] - 2023-05-22
 
 ### Features
