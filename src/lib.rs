@@ -1,4 +1,4 @@
-use std::{env, fs, io::Result, process::Command};
+use std::{collections::VecDeque, env, fs, io::Result, process::Command};
 
 use glob::glob;
 use globset::Glob;
@@ -6,7 +6,7 @@ use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
     traits::PackageReadout as _, GeneralReadout, KernelReadout, MemoryReadout, PackageReadout,
 };
-use pfetch_logo_parser::Logo;
+use pfetch_logo_parser::{parse_logo, Logo};
 
 #[derive(Debug)]
 pub enum PackageManager {
@@ -311,8 +311,23 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
     }
 }
 
+fn parse_custom_logos(filename: &str) -> Vec<Option<Logo>> {
+    let file_contents = fs::read_to_string(filename).expect("Could not open custom logo file");
+    file_contents
+        .split(";;")
+        .map(|raw_logo| parse_logo(raw_logo).map(|(_, logo)| logo))
+        .collect::<Vec<_>>()
+}
+
 pub fn logo(logo_name: &str) -> Logo {
-    let (tux, logos) = pfetch_extractor::parse_logos!();
+    let (tux, included_logos) = pfetch_extractor::parse_logos!();
+    let mut logos: VecDeque<_> = included_logos.into();
+    if let Ok(filename) = dotenvy::var("PF_CUSTOM_LOGOS") {
+        // insert custom logos in front of incuded logos
+        for custom_logo in parse_custom_logos(&filename).into_iter().flatten() {
+            logos.insert(0, custom_logo.clone());
+        }
+    };
     logos
         .into_iter()
         .find(|logo| {

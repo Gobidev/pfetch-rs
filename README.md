@@ -85,12 +85,11 @@ value.
 ## Configuration
 
 Like the original `pfetch`, `pfetch-rs` is configured through environment
-variables. Your existing config will probably still work, the only difference is
+variables. Your existing config will probably still work, the main difference is
 how padding is configured.
 
-If you want to display a custom logo, you will have to download the source code,
-make your changes to `./pfetch-extractor/logos.sh` and build the binary with
-`cargo b --release`.
+If you want to display a custom logo, use the `PF_CUSTOM_LOGOS` option, an
+example for a custom logos file can be found below.
 
 ```sh
 # Which information to display.
@@ -106,10 +105,15 @@ PF_INFO="ascii"
 # Example: Only Information.
 PF_INFO="title os host kernel uptime pkgs memory"
 
-# A file containing environment variables to source before running pfetch.
+# A file containing environment variables to source before running pfetch
 # Default: unset
 # Valid: A shell script
 PF_SOURCE=""
+
+# A file containing pfetch logos to overwrite default logos or add new logos
+# Default: unset
+# Valid: Path to a file containing pfetch logos (example below)
+PF_CUSTOM_LOGOS="~/.config/pfetch_logos"
 
 # Separator between info name and info data.
 # Default: unset
@@ -162,3 +166,48 @@ HOSTNAME=""
 # Skip package managers that take "long" to query package count (like nix)
 PF_FAST_PKG_COUNT=1
 ```
+
+A file containing custom pfetch logos could look like this (also found under
+`custom_logos_example`). This will turn the Arch Linux logo red, the Debian Logo
+blue and the Fedora logo yellow:
+
+```
+[Aa]rch*)
+	read_ascii 1 <<- EOF
+			${c1}       /\\
+			${c1}      /  \\
+			${c1}     /\\   \\
+			${c1}    /      \\
+			${c1}   /   ,,   \\
+			${c1}  /   |  |  -\\
+			${c1} /_-''    ''-_\\
+		EOF
+	;;
+[Dd]ebian*)
+	read_ascii 4 <<- EOF
+			${c4}  _____
+			${c4} /  __ \\
+			${c4}|  /    |
+			${c4}|  \\___-
+			${c4}-_
+			${c4}  --_
+		EOF
+	;;
+[Ff]edora*)
+    read_ascii 3 <<- EOF
+			        ${c3},'''''.
+			       ${c3}|   ,.  |
+			       ${c3}|  |  '_'
+			${c3}  ,....|  |..
+			${c3}.'  ,_;|   ..'
+			${c3}|  |   |  |
+			${c3}|  ',_,'  |
+			${c3} '.     ,'
+			   ${c3}'''''
+		EOF
+```
+
+_Note: Make sure to use tabs for indentation and separate logos with `;;`, as
+seen above. You only need to add the logos you want to overwrite/add, the
+default logos will stay available. The included logos can be found at
+`./pfetch-extractor/logos.sh`._
