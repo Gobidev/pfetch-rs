@@ -23,6 +23,8 @@ Leap, OpenWrt, Oracle Linux _(new)_, Parabola, Pop!\_OS _(updated)_, PureOS,
 Raspbian, Rocky Linux _(new)_, SerenityOS, Slackware, Solus, SteamOS _(new)_,
 Solaris, Ubuntu, Vanilla OS _(new)_, Void Linux, Windows _(new)_, Xeonix Linux
 
+You can check out how they look [here](./all_logos.md).
+
 For all other distributions, a penguin will be displayed.
 
 _Credit to [the original pfetch](https://github.com/dylanaraps/pfetch) and

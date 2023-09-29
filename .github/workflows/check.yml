@@ -1,6 +1,13 @@
 on: [push, pull_request]
-
+permissions:
+  contents: write
 name: CI
+
+env:
+  PF_INFO: "ascii"
+  PF_PAD1: 0
+  PF_PAD2: 0
+  PF_PAD3: 0
 
 jobs:
   checks:
@@ -77,8 +84,14 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --target=${{ matrix.target }}
+          args: --target=${{ matrix.target }} --target-dir=/tmp
           use-cross: ${{ matrix.cross }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pfetch-${{ matrix.target }}
+          path: /tmp/${{ matrix.target }}/debug/pfetch
 
       - name: Test
         uses: actions-rs/cargo@v1
@@ -86,3 +99,34 @@ jobs:
           command: test
           args: --target=${{ matrix.target }}
         if: ${{ !matrix.cross }}
+  render:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Jetbrains Mono
+        run: sudo apt update && sudo apt install -y fonts-jetbrains-mono
+
+      - name: Install typst
+        uses: yusancky/setup-typst@v2
+        with:
+          version: 'v0.8.0'
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+         name: pfetch-x86_64-unknown-linux-gnu
+         path: /tmp/
+
+      - name: Run render script
+        run: sudo chmod +x /tmp/pfetch && cd ./tools/ && ./render_all.sh /tmp/pfetch
+
+      - name: Commit Files
+        uses: EndBug/add-and-commit@v9
+        with:
+          add:
+            assets all_logos.md
+          default_author: github_actions
+          message: "chore(logos): re-render all logos"
