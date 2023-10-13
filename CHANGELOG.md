@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.8.1] - 2023-10-13
+
+### Bug Fixes
+
+- Fix macOS Sonoma "unknown" (libmacchina 7.2)
+
+### Miscellaneous
+
+- Update dependencies
+
+### Ci
+
+- Add workflow to render all logos
+
 ## [2.8.0] - 2023-07-07
 
 ### Bug Fixes
