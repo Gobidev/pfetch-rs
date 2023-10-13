@@ -95,8 +95,8 @@ impl Display for Logo {
             "{}",
             self.logo_parts
                 .iter()
-                .map(|LogoPart { color, content }| format!("{color}{content}"))
-                .collect::<String>()
+                .fold("".to_string(), |a, LogoPart { color, content }| a
+                    + &format!("{color}{content}"))
         )
     }
 }

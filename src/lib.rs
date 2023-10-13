@@ -370,10 +370,7 @@ pub fn de(general_readout: &GeneralReadout) -> Option<String> {
 }
 
 pub fn palette() -> String {
-    (1..7)
-        .map(|num| format!("\x1b[4{num}m  "))
-        .collect::<String>()
-        + "\x1b[0m"
+    (1..7).fold("".to_string(), |a, e| a + &format!("\x1b[4{e}m  ")) + "\x1b[0m"
 }
 
 fn run_system_command(command: &str, args: &[&str]) -> Result<String> {
