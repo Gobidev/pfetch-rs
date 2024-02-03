@@ -1,4 +1,4 @@
-#import "@preview/ansi-render:0.5.0": *
+#import "@preview/ansi-render:0.6.1": *
 
 #set page(width: auto, height: auto, margin: .5cm)
 

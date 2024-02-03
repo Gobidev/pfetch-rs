@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "# List Of All Logos" > ../all_logos.md
-echo "Generated using \`./tools/render_all.sh\`" >> ../all_logos.md
+echo "Generated using \`./tools/render_all.sh\`, powered by [typst](https://typst.app)" >> ../all_logos.md
 while read -r logo; do
     echo "$logo"
     PF_ASCII=$logo "$@" > ./tmp || exit 1
