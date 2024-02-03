@@ -210,7 +210,7 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
                 }
             }
         }
-        _ => general_readout.os_name().ok(),
+        _ => Some(general_readout.os_name().ok()?.replace("Unknown", "")),
     }
 }
 
