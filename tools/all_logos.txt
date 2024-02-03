@@ -5,6 +5,7 @@ amogos
 arch
 arco
 artix
+bazzite
 bedrock
 buildroot
 celos
