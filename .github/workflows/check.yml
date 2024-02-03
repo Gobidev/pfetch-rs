@@ -112,7 +112,7 @@ jobs:
       - name: Install typst
         uses: yusancky/setup-typst@v2
         with:
-          version: 'v0.8.0'
+          version: 'v0.10.0'
 
       - name: Download Artifact
         uses: actions/download-artifact@v2
