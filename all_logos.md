@@ -1,5 +1,5 @@
 # List Of All Logos
-Generated using `./tools/render_all.sh`
+Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## alma
 <img src="./assets/logos/alma.svg" width="230">
 
