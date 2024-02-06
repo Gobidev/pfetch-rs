@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.9.0] - 2024-02-06
+
+### Bug Fixes
+
+- Do not display "Unknown" in os name
+
+### Features
+
+- Add Bazzite logo (#39)
+
+### Miscellaneous
+
+- Fix clippy warnings
+- Update typst (#40)
+- Update dependencies
+
 ## [2.8.1] - 2023-10-13
 
 ### Bug Fixes
