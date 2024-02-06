@@ -21,6 +21,9 @@ Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## artix
 <img src="./assets/logos/artix.svg" width="230">
 
+## bazzite
+<img src="./assets/logos/bazzite.svg" width="230">
+
 ## bedrock
 <img src="./assets/logos/bedrock.svg" width="230">
 

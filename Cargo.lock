@@ -827,6 +827,7 @@ dependencies = [
  "glob",
  "globset",
  "libmacchina",
+ "os-release",
  "pfetch-extractor",
  "pfetch-logo-parser",
  "which",

@@ -202,13 +202,22 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
                 .unwrap_or_default()
                 .contains("/bedrock/cross/")
             {
-                Some("Bedrock Linux".to_string())
-            } else {
-                match general_readout.distribution() {
-                    Ok(distribution) => Some(distribution.replace(" TEMPLATE_VERSION_ID", "")),
-                    Err(_) => None,
-                }
+                return Some("Bedrock Linux".to_string());
             }
+            let content = os_release::OsRelease::new().ok()?;
+            let version = if !content.version.is_empty() {
+                content.version
+            } else {
+                content.version_id
+            };
+            // check for Bazzite
+            if content.pretty_name.contains("Bazzite") {
+                return Some(format!("Bazzite {version}"));
+            }
+            if !version.is_empty() {
+                return Some(format!("{} {}", content.name, version));
+            }
+            Some(content.name)
         }
         _ => Some(general_readout.os_name().ok()?.replace("Unknown", "")),
     }
