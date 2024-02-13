@@ -216,7 +216,8 @@ fn main() {
         Ok(pfetch_infos) => pfetch_infos
             .trim()
             .split(' ')
-            .map(|info| PfetchInfo::from_str(info).unwrap())
+            .map(PfetchInfo::from_str)
+            .filter_map(|i| i.ok())
             .collect(),
         Err(_) => vec![
             PfetchInfo::Ascii,
