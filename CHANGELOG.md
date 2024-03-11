@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.9.1] - 2024-03-11
+
+### Bug Fixes
+
+- Ignore invalid info values instead of crashing
+
+### Miscellaneous
+
+- Bump mio from 0.8.10 to 0.8.11 (#42)
+- Update dependencies
+
+### Ci
+
+- Remove NetBSD build
+
 ## [2.9.0] - 2024-02-06
 
 ### Bug Fixes
