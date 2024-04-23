@@ -16,13 +16,13 @@ minimalistic look.
 Arch Linux, ArcoLinux, Artix Linux, Bazzite _(new)_, Bedrock Linux, Buildroot,
 CelOS, CentOS, Crystal Linux, dahliaOS, Debian, Devuan, DietPi _(new)_,
 DragonflyBSD, Elementary OS, EndeavourOS, Fedora, Fiwix _(new)_, FreeBSD, Garuda
-Linux, Gentoo Linux, Gnu, Guix, Haiku, HydroOS, Hyperbola, instantOS, IRIX, KDE
-neon, Linux Lite, Linux, Mint, macOS, Mageia, Manjaro, Minix, MorphOS _(new)_,
-MX Linux, NetBSD, NixOS, Nobara Project _(new)_, OpenBSD, openSUSE Tumbleweed,
-openSUSE Leap, OpenWrt, Oracle Linux _(new)_, Parabola, Pop!\_OS _(updated)_,
-PureOS, Raspbian, Rocky Linux _(new)_, SerenityOS, Slackware, Solus, SteamOS
-_(new)_, Solaris, Ubuntu, Vanilla OS _(new)_, Void Linux, Windows _(new)_,
-Xeonix Linux
+Linux, Gentoo Linux, Gnu Hurd _(updated)_, Guix, Haiku, HydroOS, Hyperbola,
+instantOS, IRIX, KDE neon, Linux Lite, Linux, Mint, macOS, Mageia, Manjaro,
+Minix, MorphOS _(new)_, MX Linux, NetBSD, NixOS, Nobara Project _(new)_,
+OpenBSD, openSUSE Tumbleweed, openSUSE Leap, OpenWrt, Oracle Linux _(new)_,
+Parabola, Pop!\_OS _(updated)_, PureOS, Raspbian, Rocky Linux _(new)_,
+SerenityOS, Slackware, Solus, SteamOS _(new)_, Solaris, Ubuntu, Vanilla OS
+_(new)_, Void Linux, Windows _(new)_, Xeonix Linux
 
 You can check out how they look [here](./all_logos.md).
 
