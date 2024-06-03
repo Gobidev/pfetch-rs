@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.9.2] - 2024-06-03
+
+### Features
+
+- Update GNU Hurd logo
+
+### Miscellaneous
+
+- Speed up alpine package count (libmacchina 7.2.3)
+- Update dependencies
+
 ## [2.9.1] - 2024-03-11
 
 ### Bug Fixes
