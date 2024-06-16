@@ -194,15 +194,28 @@ fn get_info(
     }
 }
 
+fn usage() {
+    println!("pfetch     show system information");
+    println!("pfetch -v  show version");
+    std::process::exit(0);
+}
+
 fn main() {
-    // parse arguements
-    if std::env::args().any(|arg| arg.starts_with("-v") || arg.starts_with("--v")) {
-        println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
-        std::process::exit(0);
-    } else if std::env::args().len() > 1 {
-        println!("pfetch     show system information");
-        println!("pfetch -v  show version");
-        std::process::exit(0);
+    // parse command line arguments
+    match std::env::args().len() {
+        2 => match std::env::args().nth(1).unwrap().as_str() {
+            "-v" | "--version" => {
+                println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
+                std::process::exit(0);
+            }
+            "-d" | "--debug" => {
+                // in pfetch this enables stderr, but that doesn't make sense here so we just
+                // ignore it
+            }
+            _ => usage(),
+        },
+        1 | 0 => {}
+        _ => usage(),
     }
 
     // source file specified by env: PF_SOURCE
