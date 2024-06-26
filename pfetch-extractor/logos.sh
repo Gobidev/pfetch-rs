@@ -332,7 +332,7 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
         ;;
 
     ([Gg][Nn][Uu]*|[Hh]urd*)
-        read_ascii 6 <<-EOF
+        read_ascii 7 <<-EOF
 				${c7} ---${c3}[ ]${c7}<----
 				${c7} v   |      |
 				${c3}[ ]${c7}  --->${c3}[ ]${c7}|
