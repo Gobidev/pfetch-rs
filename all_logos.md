@@ -30,6 +30,9 @@ Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## buildroot
 <img src="./assets/logos/buildroot.svg" width="230">
 
+## cachyos
+<img src="./assets/logos/cachyos.svg" width="230">
+
 ## celos
 <img src="./assets/logos/celos.svg" width="230">
 
