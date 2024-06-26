@@ -227,26 +227,30 @@ pub fn kernel(kernel_readout: &KernelReadout) -> Option<String> {
     kernel_readout.os_release().ok()
 }
 
-fn seconds_to_string(time: usize) -> String {
-    let days = if time > 86400 {
-        let days_pre = time / 60 / 60 / 24;
-        days_pre.to_string() + "d"
-    } else {
-        "".to_string()
-    };
-    let hours = if time > 3600 {
-        let hours_pre = (time / 60 / 60) % 24;
-        hours_pre.to_string() + "h"
-    } else {
-        "".to_string()
-    };
-    let minutes = if time > 60 {
-        let minutes_pre = (time / 60) % 60;
-        minutes_pre.to_string() + "m"
-    } else {
-        "0m".to_string()
-    };
-    format!("{days} {hours} {minutes}").trim_start().to_owned()
+pub fn seconds_to_string(seconds: usize) -> String {
+    let days = seconds / 86400;
+    let hours = (seconds % 86400) / 3600;
+    let minutes = (seconds % 3600) / 60;
+
+    let mut result = String::with_capacity(10);
+
+    if days > 0 {
+        result.push_str(&format!("{}d", days));
+    }
+    if hours > 0 {
+        if !result.is_empty() {
+            result.push(' ');
+        }
+        result.push_str(&format!("{}h", hours));
+    }
+    if minutes > 0 || result.is_empty() {
+        if !result.is_empty() {
+            result.push(' ');
+        }
+        result.push_str(&format!("{}m", minutes));
+    }
+
+    result
 }
 
 pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
@@ -408,3 +412,49 @@ fn run_and_count_lines(command: &str, args: &[&str]) -> usize {
         .lines()
         .count()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_seconds_to_string_0() {
+        assert_eq!(seconds_to_string(0), "0m".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_60() {
+        assert_eq!(seconds_to_string(60), "1m".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_3600() {
+        assert_eq!(seconds_to_string(3600), "1h".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_3660() {
+        assert_eq!(seconds_to_string(3660), "1h 1m".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_86400() {
+        assert_eq!(seconds_to_string(86400), "1d".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_90000() {
+        assert_eq!(seconds_to_string(90000), "1d 1h".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_86460() {
+        assert_eq!(seconds_to_string(86460), "1d 1m".to_string());
+    }
+
+    #[test]
+    fn test_seconds_to_string_90060() {
+        assert_eq!(seconds_to_string(90060), "1d 1h 1m".to_string());
+    }
+}
+
