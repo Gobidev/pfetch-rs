@@ -8,6 +8,7 @@ artix
 bazzite
 bedrock
 buildroot
+cachyos
 celos
 centos
 crystallinux
