@@ -84,18 +84,17 @@ fn packages(
         | PackageManager::Xbps
         | PackageManager::Apk
         | PackageManager::Portage
+        | PackageManager::Nix
         | PackageManager::Opkg => get_macchina_package_count(
             macchina_package_count,
             &format!("{pkg_manager:?}").to_lowercase(),
         )
         .unwrap_or(0),
-        // macchina only supports sqlite database backend for rpm
         PackageManager::Rpm => match get_macchina_package_count(
             macchina_package_count,
             &format!("{pkg_manager:?}").to_lowercase(),
         ) {
             Some(count) => count,
-            // for other databases run `rpm` (slow), see Macchina-CLI/libmacchina#154
             None => {
                 if !skip_slow {
                     run_and_count_lines("rpm", &["-qa"])
@@ -128,23 +127,6 @@ fn packages(
                     Ok(files) => files.count(),
                     Err(_) => 0,
                 }
-            } else {
-                0
-            }
-        }
-        PackageManager::Nix => {
-            if check_if_command_exists("nix-store") && !skip_slow {
-                run_and_count_lines(
-                    "nix-store",
-                    &["-q", "--requisites", "/run/current-system/sw"],
-                ) + run_and_count_lines(
-                    "nix-store",
-                    &[
-                        "-q",
-                        "--requisites",
-                        &format!("{}/.nix-profile", env::var("HOME").unwrap_or_default()),
-                    ],
-                )
             } else {
                 0
             }
