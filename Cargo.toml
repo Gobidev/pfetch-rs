@@ -21,7 +21,7 @@ globset = "0.4.10"
 dotenvy = "0.15.6"
 glob = "0.3.1"
 which = "4.4.0"
-libmacchina = {git = "https://github.com/Macchina-CLI/libmacchina", rev = "3a5bec05e7a6fc6b5585bc1ee0a8f2583a77d9eb"}
+libmacchina = "7.3.0"
 crossterm = "0.27.0"
 os-release = "0.1.0"
 
