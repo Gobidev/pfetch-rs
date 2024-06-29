@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.10.0] - 2024-06-29
+
+### Bug Fixes
+
+- Improve uptime calculation
+- Change primary text color for the GNU Hurd logo (#55)
+
+### Features
+
+- Add CachyOS logo (#56)
+- Use faster method for nix package count (#57)
+
+### Miscellaneous
+
+- Update the license year (#53)
+- Update dependencies
+
 ## [2.9.2] - 2024-06-03
 
 ### Features
