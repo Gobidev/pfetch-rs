@@ -83,13 +83,9 @@ managers. For more info, see [Improving Performance](#imp_perf)._
 
 ### Improving Performance
 
-The by far slowest part of the `pfetch` execution time is counting the installed
-packages. For most package managers this is still very fast, but there are some
-(currently `nix` (and `zypper`, if `rpm-devel` is not installed)) that take
-~500ms to report installed packages, which takes away all performance benefits
-of the Rust version. If you have one or more of these installed, you can skip
-counting them by setting the `PF_FAST_PKG_COUNT` environment variable to any
-value.
+Counting packages of `zypper` can be sped up a lot by installing the `rpm-devel`
+package. If the `zypper` package count takes too long, it can be disabled by
+setting the `PF_FAST_PKG_COUNT` environment variable to any value.
 
 ## Configuration
 
@@ -172,7 +168,7 @@ USER=""
 # Which hostname to display.
 HOSTNAME=""
 
-# Skip package managers that take "long" to query package count (like nix)
+# Skip zypper package count if only slow method is available
 PF_FAST_PKG_COUNT=1
 ```
 
