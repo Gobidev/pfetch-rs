@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.11.0] - 2024-08-02
+
+### Bug Fixes
+
+- Fix `PF_COLOR=0` stripping too much
+
+### Features
+
+- Update EndeavourOS logo (#59)
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [2.10.0] - 2024-06-29
 
 ### Bug Fixes
