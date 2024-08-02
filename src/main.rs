@@ -63,7 +63,12 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
     } else {
         "".to_string()
     };
-    let logo = logo.to_string();
+    let color_enabled = dotenvy::var("PF_COLOR").unwrap_or_default() != "0";
+    let logo = if color_enabled {
+        logo.to_string()
+    } else {
+        format!("{:#}", logo)
+    };
     let mut logo_lines = logo.lines();
     let raw_logo_lines: Vec<_> = raw_logo.lines().collect();
     let logo_width = raw_logo_lines
@@ -78,6 +83,7 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
         .skip(1)
         .map(|(_, line, _)| {
             if line.starts_with("\x1b[4") {
+                // exclude palette from info1 width
                 0
             } else {
                 line.len()
@@ -103,8 +109,9 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
 
     for l in 0..line_amount {
         pfetch_str += &format!(
-            "{padding1}\x1b[1m{logo}{padding2}{color}{info1}\x1b[0m{separator}{padding3}{color2}{info2}\n",
+            "{padding1}{bold}{logo}{padding2}{color}{info1}{nobold}{separator}{padding3}{color2}{info2}\n",
             padding1 = " ".repeat(padding1),
+            bold = if color_enabled {"\x1b[1m"} else {""},
             logo = if logo_enabled {
                 logo_lines.next().unwrap_or("")
             } else {
@@ -114,8 +121,9 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
                 logo_width - raw_logo_lines.get(l).map_or(0, |line| line.chars().count())
                     + if logo_enabled { padding2 } else { 0 }
             ),
-            color = info.get(l).map_or("".to_owned(), |line| line.0.to_string()),
+            color = if color_enabled {info.get(l).map_or("".to_owned(), |line| line.0.to_string())} else {"".to_string()},
             info1 = info.get(l).map_or("", |line| &line.1),
+            nobold = if color_enabled {"\x1b[0m"} else {""},
             separator = info.get(l).map_or("".to_string(), |line|
                 if ! &line.2.is_empty() {
                     dotenvy::var("PF_SEP").unwrap_or_default()
@@ -125,7 +133,7 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
                 info1_width.saturating_sub(info.get(l).map_or(0, |(_, line, _)| line.len()))
                     + padding3
             ),
-            color2 = match dotenvy::var("PF_COL2") {
+            color2 = if color_enabled {match dotenvy::var("PF_COL2") {
                 Ok(newcolor) => {
                     match Color::from_str(&newcolor) {
                         Ok(newcolor) => format!("{newcolor}"),
@@ -133,18 +141,18 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
                     }
                 },
                 Err(_) => "".to_string()
-            },
+            }} else {"".to_string()},
             info2 = info.get(l).map_or("", |line| &line.2)
         )
     }
 
     // if colors are disabled, remove them from string
-    if dotenvy::var("PF_COLOR").unwrap_or_default() == "0" {
-        pfetch_str = pfetch_str
-            .split("\x1b[")
-            .map(|chunk| chunk.chars().skip(3).collect::<String>())
-            .collect();
-    }
+    // if dotenvy::var("PF_COLOR").unwrap_or_default() == "0" {
+    //     pfetch_str = pfetch_str
+    //         .split("\x1b[")
+    //         .map(|chunk| chunk.chars().skip(3).collect::<String>())
+    //         .collect();
+    // }
 
     // disable line wrap
     crossterm::execute!(std::io::stdout(), crossterm::terminal::DisableLineWrap)

@@ -96,7 +96,11 @@ impl Display for Logo {
             self.logo_parts
                 .iter()
                 .fold("".to_string(), |a, LogoPart { color, content }| a
-                    + &format!("{color}{content}"))
+                    + &if !f.alternate() {
+                        format!("{color}{content}")
+                    } else {
+                        format!("{content}")
+                    })
         )
     }
 }
@@ -107,7 +111,7 @@ pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
     if input.is_empty() {
         return None;
     }
-    let regex = Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d)? *(\d)?").unwrap();
+    let regex = Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d)?").unwrap();
 
     let groups = regex.captures(&input).expect("Error while parsing logo");
 
@@ -116,10 +120,7 @@ pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
         Some(color) => color.as_str().parse::<u8>().unwrap(),
         None => 7,
     };
-    let secondary_color = match groups.get(3) {
-        Some(color) => color.as_str().parse::<u8>().unwrap(),
-        None => (primary_color + 1) % 8,
-    };
+    let secondary_color = (primary_color + 1) % 8;
     let logo = input
         .split_once("EOF\n")
         .expect("Could not find start of logo, make sure to include the `<<- EOF` and to use tabs for indentation")
