@@ -5,6 +5,70 @@ use libmacchina::{
 use pfetch_logo_parser::{Color, Logo, LogoPart};
 use std::{env, fmt::Display, str::FromStr};
 
+struct Config {
+    pf_ascii: Option<String>,
+    pf_col1: String,
+    pf_col2: String,
+    pf_col3: String,
+    pf_color: String,
+    pf_sep: String,
+    pf_pad1: String,
+    pf_pad2: String,
+    pf_pad3: String,
+    user: String,
+    hostname: String,
+    pf_source: String,
+    pf_fast_pkg_count: bool,
+    pf_info: Vec<PfetchInfo>,
+    pf_custom_logos: String,
+    print_version: bool,
+}
+
+impl Config {
+    fn load() -> Self {
+        // source file specified by env: PF_SOURCE
+        if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
+            let _ = dotenvy::from_path(filepath);
+        }
+        Self {
+            pf_ascii: dotenvy::var("PF_ASCII").ok(),
+            pf_col1: dotenvy::var("PF_COL1").unwrap_or_default(),
+            pf_col2: dotenvy::var("PF_COL2").unwrap_or_default(),
+            pf_col3: dotenvy::var("PF_COL3").unwrap_or_default(),
+            pf_color: dotenvy::var("PF_COLOR").unwrap_or_default(),
+            pf_sep: dotenvy::var("PF_SEP").unwrap_or_default(),
+            pf_pad1: dotenvy::var("PF_PAD1").unwrap_or_default(),
+            pf_pad2: dotenvy::var("PF_PAD2").unwrap_or_default(),
+            pf_pad3: dotenvy::var("PF_PAD3").unwrap_or_default(),
+            user: dotenvy::var("USER").unwrap_or_default(),
+            hostname: dotenvy::var("HOSTNAME").unwrap_or_default(),
+            pf_source: dotenvy::var("PF_SOURCE").unwrap_or_default(),
+            pf_fast_pkg_count: dotenvy::var("PF_FAST_PKG_COUNT").is_ok(),
+            pf_info: match dotenvy::var("PF_INFO") {
+                Ok(pfetch_infos) => pfetch_infos
+                    .trim()
+                    .split(' ')
+                    .map(PfetchInfo::from_str)
+                    .filter_map(|i| i.ok())
+                    .collect(),
+                Err(_) => vec![
+                    PfetchInfo::Ascii,
+                    PfetchInfo::Title,
+                    PfetchInfo::Os,
+                    PfetchInfo::Host,
+                    PfetchInfo::Kernel,
+                    PfetchInfo::Uptime,
+                    PfetchInfo::Pkgs,
+                    PfetchInfo::Memory,
+                ],
+            },
+            pf_custom_logos: dotenvy::var("PF_CUSTOM_LOGOS").unwrap_or_default(),
+            print_version: std::env::args()
+                .any(|arg| arg.starts_with("-v") || arg.starts_with("--v")),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 enum PfetchInfo {
     Ascii,
@@ -203,57 +267,15 @@ fn get_info(
 }
 
 fn main() {
-    // parse arguements
-    if std::env::args().any(|arg| arg.starts_with("-v") || arg.starts_with("--v")) {
+    let config = Config::load();
+    if config.print_version {
         println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
         std::process::exit(0);
     } else if std::env::args().len() > 1 {
+        // TODO: change this for raw logos
         println!("pfetch     show system information");
         println!("pfetch -v  show version");
         std::process::exit(0);
-    }
-
-    // source file specified by env: PF_SOURCE
-    if let Ok(filepath) = dotenvy::var("PF_SOURCE") {
-        let _ = dotenvy::from_path(filepath);
-    }
-    // Check if SKIP_SLOW is enabled
-    let skip_slow_package_managers = dotenvy::var("PF_FAST_PKG_COUNT").is_ok();
-
-    let enabled_pf_info_base: Vec<PfetchInfo> = match dotenvy::var("PF_INFO") {
-        Ok(pfetch_infos) => pfetch_infos
-            .trim()
-            .split(' ')
-            .map(PfetchInfo::from_str)
-            .filter_map(|i| i.ok())
-            .collect(),
-        Err(_) => vec![
-            PfetchInfo::Ascii,
-            PfetchInfo::Title,
-            PfetchInfo::Os,
-            PfetchInfo::Host,
-            PfetchInfo::Kernel,
-            PfetchInfo::Uptime,
-            PfetchInfo::Pkgs,
-            PfetchInfo::Memory,
-        ],
-    };
-
-    // insert blank lines before and after palettes
-    let mut enabled_pf_info: Vec<PfetchInfo> = vec![];
-    let mut ascii_enabled: bool = false;
-    for info in enabled_pf_info_base {
-        match info {
-            PfetchInfo::Palette => {
-                enabled_pf_info.push(PfetchInfo::BlankLine);
-                enabled_pf_info.push(PfetchInfo::Palette);
-                enabled_pf_info.push(PfetchInfo::BlankLine);
-            }
-            PfetchInfo::Ascii => {
-                ascii_enabled = true;
-            }
-            i => enabled_pf_info.push(i),
-        }
     }
 
     let readouts = Readouts {
@@ -265,9 +287,7 @@ fn main() {
 
     let os = pfetch::os(&GeneralReadout::new()).unwrap_or_default();
 
-    let logo_override = env::var("PF_ASCII");
-
-    let logo_name = logo_override.unwrap_or(match env::consts::OS {
+    let logo_name = config.pf_ascii.unwrap_or(match env::consts::OS {
         "linux" => os.clone(),
         other => other.to_owned(),
     });
@@ -275,25 +295,22 @@ fn main() {
     let mut logo = pfetch::logo(&logo_name);
 
     // color overrides
-    if let Ok(newcolor) = dotenvy::var("PF_COL1") {
-        if let Ok(newcolor) = Color::from_str(&newcolor) {
-            logo.primary_color = newcolor;
-        }
+    if let Ok(newcolor) = Color::from_str(&config.pf_col1) {
+        logo.primary_color = newcolor;
     }
 
-    if let Ok(newcolor) = dotenvy::var("PF_COL3") {
-        if newcolor == "COL1" {
-            logo.secondary_color = logo.primary_color;
-        } else if let Ok(newcolor) = Color::from_str(&newcolor) {
-            logo.secondary_color = newcolor;
-        }
+    if config.pf_col3 == "COL1" {
+        logo.secondary_color = logo.primary_color;
+    } else if let Ok(newcolor) = Color::from_str(&config.pf_col3) {
+        logo.secondary_color = newcolor;
     }
 
-    let gathered_pfetch_info: Vec<(Color, String, String)> = enabled_pf_info
+    let gathered_pfetch_info: Vec<(Color, String, String)> = config
+        .pf_info
         .iter()
         .filter_map(|info| match info {
             PfetchInfo::Os => Some((logo.primary_color, info.to_string(), os.clone())),
-            _ => get_info(info, &readouts, skip_slow_package_managers).map(|info_str| match info {
+            _ => get_info(info, &readouts, config.pf_fast_pkg_count).map(|info_str| match info {
                 PfetchInfo::Title => (logo.secondary_color, info_str, "".to_string()),
                 PfetchInfo::BlankLine => (logo.primary_color, "".to_string(), "".to_string()),
                 PfetchInfo::Palette => (logo.primary_color, info_str, "".to_string()),
@@ -302,5 +319,12 @@ fn main() {
         })
         .collect();
 
-    pfetch(gathered_pfetch_info, logo, ascii_enabled);
+    pfetch(
+        gathered_pfetch_info,
+        logo,
+        config
+            .pf_info
+            .iter()
+            .any(|x| matches!(&x, PfetchInfo::Ascii)),
+    );
 }
