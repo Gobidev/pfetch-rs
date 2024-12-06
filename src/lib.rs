@@ -90,19 +90,17 @@ fn packages(
             &format!("{pkg_manager:?}").to_lowercase(),
         )
         .unwrap_or(0),
-        PackageManager::Rpm => match get_macchina_package_count(
+        PackageManager::Rpm => get_macchina_package_count(
             macchina_package_count,
             &format!("{pkg_manager:?}").to_lowercase(),
-        ) {
-            Some(count) => count,
-            None => {
-                if !skip_slow {
-                    run_and_count_lines("rpm", &["-qa"])
-                } else {
-                    0
-                }
+        )
+        .unwrap_or_else(|| {
+            if !skip_slow {
+                run_and_count_lines("rpm", &["-qa"])
+            } else {
+                0
             }
-        },
+        }),
         PackageManager::Guix => run_and_count_lines("guix", &["package", "--list-installed"]),
         PackageManager::Crux => {
             if check_if_command_exists("crux") {
@@ -139,37 +137,31 @@ pub fn user_at_hostname(
     username_override: &Option<String>,
     hostname_override: &Option<String>,
 ) -> Option<String> {
-    let username = match username_override {
-        Some(username) => Ok(username.to_string()),
-        None => general_readout.username(),
-    };
-    let hostname = match hostname_override {
-        Some(hostname) => Ok(hostname.to_string()),
-        None => general_readout.hostname(),
-    };
-    if username.is_err() || hostname.is_err() {
-        None
-    } else {
-        Some(format!(
-            "{}@{}",
-            username.unwrap_or_default(),
-            hostname.unwrap_or_default()
-        ))
+    let username = username_override
+        .to_owned()
+        .or_else(|| general_readout.username().ok());
+    let hostname = hostname_override
+        .to_owned()
+        .or_else(|| general_readout.hostname().ok());
+
+    if let (Some(username), Some(hostname)) = (username, hostname) {
+        return Some(format!("{username}@{hostname}"));
     }
+    None
 }
 
 pub fn memory(memory_readout: &MemoryReadout) -> Option<String> {
     let total_memory = memory_readout.total();
     let used_memory = memory_readout.used();
-    if total_memory.is_err() || used_memory.is_err() {
-        None
-    } else {
-        Some(format!(
+
+    if let (Ok(total_memory), Ok(used_memory)) = (total_memory, used_memory) {
+        return Some(format!(
             "{}M / {}M",
-            used_memory.unwrap() / 1024,
-            total_memory.unwrap() / 1024
-        ))
+            used_memory / 1024,
+            total_memory / 1024
+        ));
     }
+    None
 }
 
 pub fn cpu(general_readout: &GeneralReadout) -> Option<String> {
@@ -236,7 +228,7 @@ pub fn seconds_to_string(seconds: usize) -> String {
 }
 
 pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
-    Some(seconds_to_string(general_readout.uptime().ok()?))
+    general_readout.uptime().ok().map(seconds_to_string)
 }
 
 pub fn host(general_readout: &GeneralReadout) -> Option<String> {
@@ -439,4 +431,3 @@ mod tests {
         assert_eq!(seconds_to_string(90060), "1d 1h 1m".to_string());
     }
 }
-
