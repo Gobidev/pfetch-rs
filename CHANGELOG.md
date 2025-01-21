@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.11.1] - 2025-01-21
+
+### Bug Fixes
+
+- Use unicode-width to determine logo width
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [2.11.0] - 2024-08-02
 
 ### Bug Fixes
