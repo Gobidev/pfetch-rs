@@ -4,6 +4,7 @@ use libmacchina::{
 };
 use pfetch_logo_parser::{Color, Logo, LogoPart};
 use std::{env, fmt::Display, str::FromStr};
+use unicode_width::UnicodeWidthStr;
 
 #[derive(Debug, PartialEq)]
 enum PfetchInfo {
@@ -73,7 +74,7 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
     let raw_logo_lines: Vec<_> = raw_logo.lines().collect();
     let logo_width = raw_logo_lines
         .iter()
-        .map(|line| line.chars().count())
+        .map(|line| line.width())
         .max()
         .unwrap_or(0);
     let line_amount = usize::max(raw_logo_lines.len(), info.len());
@@ -118,7 +119,7 @@ fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool) {
                 ""
             },
             padding2 = " ".repeat(
-                logo_width - raw_logo_lines.get(l).map_or(0, |line| line.chars().count())
+                logo_width - raw_logo_lines.get(l).map_or(0, |line| line.width())
                     + if logo_enabled { padding2 } else { 0 }
             ),
             color = if color_enabled {info.get(l).map_or("".to_owned(), |line| line.0.to_string())} else {"".to_string()},

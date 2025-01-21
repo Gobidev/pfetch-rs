@@ -24,6 +24,7 @@ which = "6.0.2"
 libmacchina = "7.3.0"
 crossterm = "0.28.1"
 os-release = "0.1.0"
+unicode-width = "0.2.0"
 
 [profile.release]
 strip = true
