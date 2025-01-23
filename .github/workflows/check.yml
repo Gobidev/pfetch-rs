@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Bootstrap
         uses: actions-rs/toolchain@v1
@@ -88,7 +88,7 @@ jobs:
           use-cross: ${{ matrix.cross }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pfetch-${{ matrix.target }}
           path: /tmp/${{ matrix.target }}/debug/pfetch
@@ -115,10 +115,10 @@ jobs:
           version: 'v0.10.0'
 
       - name: Download Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-         name: pfetch-x86_64-unknown-linux-gnu
-         path: /tmp/
+          name: pfetch-x86_64-unknown-linux-gnu
+          path: /tmp/
 
       - name: Run render script
         run: sudo chmod +x /tmp/pfetch && cd ./tools/ && ./render_all.sh /tmp/pfetch
