@@ -104,15 +104,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Jetbrains Mono
         run: sudo apt update && sudo apt install -y fonts-jetbrains-mono
 
       - name: Install typst
-        uses: yusancky/setup-typst@v2
+        uses: typst-community/setup-typst@v4
         with:
-          version: 'v0.10.0'
+          version: 'v0.12.0'
 
       - name: Download Artifact
         uses: actions/download-artifact@v4

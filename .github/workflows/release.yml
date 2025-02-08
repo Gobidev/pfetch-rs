@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Generate changelog
@@ -22,7 +22,7 @@ jobs:
         with:
           args: -vv --latest --strip header
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body: ${{ steps.git-cliff.outputs.content }}
         env:
@@ -122,7 +122,7 @@ jobs:
             strip: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Bootstrap
         uses: actions-rs/toolchain@v1
@@ -146,9 +146,8 @@ jobs:
         shell: bash
 
       - name: Upload binaries
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.release_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
