@@ -572,6 +572,18 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Nn]ima*)
+        read_ascii 4 <<- EOF
+				${c67},MM-.     ,MM.
+				${c67}:${c4}N${c6}III${c67}\`.   ${c4}N${c6}II${c67}M
+				${c67}:${c4}N${c6}II${c4}N${c6}II${c67}\`. ${c4}N${c6}II${c67}M
+				${c67}:${c4}N${c6}II${c67}M.${c4}N${c6}II${c67}M${c4}N${c6}II${c67}M
+				${c67}:${c4}N${c6}II${c67}M +${c4}N${c6}II${c4}N${c6}II${c67}M
+				${c67}:${c4}N${c6}II${c67}M  'M${c4}N${c6}III${c67}M
+				${c67} "MM"    "MMM'
+			EOF
+		;;
+
     [Nn]ix[Oo][Ss]*)
         read_ascii 4 <<- EOF
 				${c4}  \\\\  \\\\ //

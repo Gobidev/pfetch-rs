@@ -43,6 +43,7 @@ morphos
 minix
 mx
 netbsd
+nima
 nixos
 nobara
 openbsd
