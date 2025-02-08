@@ -135,6 +135,9 @@ Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## netbsd
 <img src="./assets/logos/netbsd.svg" width="230">
 
+## nima
+<img src="./assets/logos/nima.svg" width="230">
+
 ## nixos
 <img src="./assets/logos/nixos.svg" width="230">
 
