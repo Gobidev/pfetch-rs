@@ -21,6 +21,7 @@ elementary
 endeavour
 fedora
 fiwix
+finix
 freebsd
 garuda
 gentoo
