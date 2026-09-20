@@ -4,132 +4,74 @@ use glob::glob;
 use globset::Glob;
 use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
-    traits::PackageReadout as _, GeneralReadout, KernelReadout, MemoryReadout, PackageReadout,
+    traits::PackageManager, traits::PackageReadout as _, GeneralReadout, KernelReadout,
+    MemoryReadout, PackageReadout,
 };
 use pfetch_logo_parser::{parse_logo, Logo};
-
-#[derive(Debug)]
-pub enum PackageManager {
-    Pacman,
-    Dpkg,
-    Xbps,
-    Apk,
-    Rpm,
-    Flatpak,
-    Crux,
-    Guix,
-    Opkg,
-    Kiss,
-    Portage,
-    Pkgtool,
-    Nix,
-}
 
 /// Obtain the amount of installed packages on the system by checking all installed supported package
 /// managers and adding the amounts
 pub fn total_packages(package_readout: &PackageReadout, skip_slow: bool) -> usize {
-    match env::consts::OS {
-        "linux" => {
-            let macchina_package_count: Vec<(String, usize)> = package_readout
-                .count_pkgs()
-                .iter()
-                .map(|(macchina_manager, count)| (macchina_manager.to_string(), *count))
-                .collect();
-            [
-                PackageManager::Pacman,
-                PackageManager::Dpkg,
-                PackageManager::Xbps,
-                PackageManager::Apk,
-                PackageManager::Rpm,
-                PackageManager::Flatpak,
-                PackageManager::Crux,
-                PackageManager::Guix,
-                PackageManager::Opkg,
-                PackageManager::Kiss,
-                PackageManager::Portage,
-                PackageManager::Pkgtool,
-                PackageManager::Nix,
-            ]
-            .iter()
-            .map(|mngr| packages(mngr, &macchina_package_count, skip_slow))
-            .sum()
-        }
-        _ => package_readout.count_pkgs().iter().map(|elem| elem.1).sum(),
+    let counts = package_readout.count_pkgs();
+    let total = counts.iter().map(|(_, count)| *count).sum();
+
+    if env::consts::OS == "linux" {
+        total + fallback_packages(&counts, skip_slow)
+    } else {
+        total
     }
 }
 
-fn get_macchina_package_count(
-    macchina_result: &[(String, usize)],
-    package_manager_name: &str,
-) -> Option<usize> {
-    macchina_result
+/// Fallbacks for package managers libmacchina cannot count on Linux
+fn fallback_packages(counts: &[(PackageManager, usize)], skip_slow: bool) -> usize {
+    let has_rpm = counts.iter().any(|(m, _)| matches!(m, PackageManager::Rpm));
+    let has_opkg = counts
         .iter()
-        .find(|entry| entry.0 == package_manager_name)
-        .map(|entry| entry.1)
-}
+        .any(|(m, _)| matches!(m, PackageManager::Opkg));
 
-/// return the amount of packages installed with a given linux package manager
-/// Return `0` if the package manager is not installed
-fn packages(
-    pkg_manager: &PackageManager,
-    macchina_package_count: &[(String, usize)],
-    skip_slow: bool,
-) -> usize {
-    match pkg_manager {
-        // libmacchina has very fast implementations for most package managers, so we use them
-        // where we can, otherwise we fall back to method used by dylans version of pfetch
-        PackageManager::Pacman
-        | PackageManager::Flatpak
-        | PackageManager::Dpkg
-        | PackageManager::Xbps
-        | PackageManager::Apk
-        | PackageManager::Portage
-        | PackageManager::Nix
-        | PackageManager::Opkg => get_macchina_package_count(
-            macchina_package_count,
-            &format!("{pkg_manager:?}").to_lowercase(),
-        )
-        .unwrap_or(0),
-        PackageManager::Rpm => get_macchina_package_count(
-            macchina_package_count,
-            &format!("{pkg_manager:?}").to_lowercase(),
-        )
-        .unwrap_or_else(|| {
-            if !skip_slow {
-                run_and_count_lines("rpm", &["-qa"])
-            } else {
-                0
-            }
-        }),
-        PackageManager::Guix => run_and_count_lines("guix", &["package", "--list-installed"]),
-        PackageManager::Crux => {
-            if check_if_command_exists("crux") {
-                run_and_count_lines("pkginfo", &["-i"])
-            } else {
-                0
-            }
-        }
-        PackageManager::Kiss => {
-            if check_if_command_exists("kiss") {
-                match glob("/var/db/kiss/installed/*/") {
-                    Ok(files) => files.count(),
-                    Err(_) => 0,
-                }
-            } else {
-                0
-            }
-        }
-        PackageManager::Pkgtool => {
-            if check_if_command_exists("pkgtool") {
-                match glob("/var/log/packages/*") {
-                    Ok(files) => files.count(),
-                    Err(_) => 0,
-                }
-            } else {
-                0
-            }
+    let mut total = 0;
+
+    // rpm: use the CLI when libmacchina cannot read its database
+    if !has_rpm && !skip_slow {
+        total += run_and_count_lines("rpm", &["-qa"]);
+    }
+
+    // opkg: libmacchina only counts it with the `openwrt` feature
+    if !has_opkg {
+        total += count_opkg();
+    }
+
+    if check_if_command_exists("guix") {
+        total += run_and_count_lines("guix", &["package", "--list-installed"]);
+    }
+    if check_if_command_exists("crux") {
+        total += run_and_count_lines("pkginfo", &["-i"]);
+    }
+    if check_if_command_exists("kiss") {
+        if let Ok(files) = glob("/var/db/kiss/installed/*/") {
+            total += files.count();
         }
     }
+    if check_if_command_exists("pkgtool") {
+        if let Ok(files) = glob("/var/log/packages/*") {
+            total += files.count();
+        }
+    }
+
+    total
+}
+
+fn count_opkg() -> usize {
+    fs::read_to_string("/usr/lib/opkg/status")
+        .map(|status| count_status_packages(&status))
+        .unwrap_or(0)
+}
+
+fn count_status_packages(status: &str) -> usize {
+    status
+        .lines()
+        .filter(|line| line.starts_with("Package:"))
+        .count()
 }
 
 pub fn user_at_hostname(
@@ -431,5 +373,11 @@ mod tests {
     #[test]
     fn test_seconds_to_string_90060() {
         assert_eq!(seconds_to_string(90060), "1d 1h 1m".to_string());
+    }
+
+    #[test]
+    fn test_count_status_packages() {
+        let status = "Package: foo\nVersion: 1\n\nPackage: bar\nVersion: 2\n";
+        assert_eq!(count_status_packages(status), 2);
     }
 }
