@@ -66,6 +66,9 @@ Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## fedora
 <img src="./assets/logos/fedora.svg" width="230">
 
+## finix
+<img src="./assets/logos/finix.svg" width="230">
+
 ## fiwix
 <img src="./assets/logos/fiwix.svg" width="230">
 
