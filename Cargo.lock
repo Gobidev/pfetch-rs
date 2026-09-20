@@ -824,7 +824,7 @@ dependencies = [
 
 [[package]]
 name = "pfetch"
-version = "2.11.1"
+version = "3.0.0"
 dependencies = [
  "crossterm",
  "dotenvy",
@@ -840,7 +840,7 @@ dependencies = [
 
 [[package]]
 name = "pfetch-extractor"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "pfetch-logo-parser",
  "proc-macro2",
@@ -849,7 +849,7 @@ dependencies = [
 
 [[package]]
 name = "pfetch-logo-parser"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "proc-macro2",
  "quote",
