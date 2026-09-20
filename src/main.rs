@@ -22,11 +22,9 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts, config: &Config) -> Option<S
     match info {
         PfetchInfo::Ascii => None,
         PfetchInfo::Os => pfetch::os(&readouts.general_readout),
-        PfetchInfo::Title => pfetch::user_at_hostname(
-            &readouts.general_readout,
-            &config.user,
-            &config.hostname,
-        ),
+        PfetchInfo::Title => {
+            pfetch::user_at_hostname(&readouts.general_readout, &config.user, &config.hostname)
+        }
         PfetchInfo::Host => pfetch::host(&readouts.general_readout),
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
@@ -55,7 +53,11 @@ fn main() {
     if config.print_help {
         cli::print_unknown_args(&config.args);
         cli::print_help();
-        std::process::exit(if config.args.unknown_args.is_empty() { 0 } else { 1 });
+        std::process::exit(if config.args.unknown_args.is_empty() {
+            0
+        } else {
+            1
+        });
     }
 
     let general_readout = GeneralReadout::new();
@@ -100,11 +102,8 @@ fn main() {
         })
         .collect();
 
-    let logo_enabled = config.raw_logo.is_some()
-        || config
-            .info
-            .iter()
-            .any(|x| matches!(x, PfetchInfo::Ascii));
+    let logo_enabled =
+        config.raw_logo.is_some() || config.info.iter().any(|x| matches!(x, PfetchInfo::Ascii));
 
     render::pfetch(gathered_pfetch_info, logo, logo_enabled, &config);
 }

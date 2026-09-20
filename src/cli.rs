@@ -40,7 +40,9 @@ pub fn parse_args_from(iter: impl IntoIterator<Item = String>) -> Args {
             "-h" | "--help" => args.print_help = true,
             "--color" => args.color = Some(true),
             "--no-color" => args.color = Some(false),
-            "--file-raw" | "--raw" => args.raw_logo = Some(parse_value_arg(&mut iter, "--file-raw")),
+            "--file-raw" | "--raw" => {
+                args.raw_logo = Some(parse_value_arg(&mut iter, "--file-raw"))
+            }
             arg if arg.starts_with("--file-raw=") || arg.starts_with("--raw=") => {
                 args.raw_logo = parse_key_value_arg(arg);
             }

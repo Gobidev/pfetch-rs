@@ -103,7 +103,10 @@ impl Config {
         if args.print_version || args.print_help {
             return Self::for_help_or_version(args);
         }
-        let source = args.source.clone().or_else(|| dotenvy::var("PF_SOURCE").ok());
+        let source = args
+            .source
+            .clone()
+            .or_else(|| dotenvy::var("PF_SOURCE").ok());
         if let Some(filepath) = source {
             let _ = dotenvy::from_path(filepath);
         }
@@ -144,9 +147,8 @@ impl Config {
     ) -> Self {
         let env: HashMap<String, String> = env.collect();
 
-        let parse_color = |key: &str| -> Option<Color> {
-            env.get(key).and_then(|s| Color::from_str(s).ok())
-        };
+        let parse_color =
+            |key: &str| -> Option<Color> { env.get(key).and_then(|s| Color::from_str(s).ok()) };
 
         let col1 = parse_color("PF_COL1");
         let col3_is_col1 = env.get("PF_COL3").map(|s| s.as_str()) == Some("COL1");
@@ -163,21 +165,11 @@ impl Config {
             col2: parse_color("PF_COL2"),
             col3,
             col3_is_col1,
-            color: env.get("PF_COLOR").map(|s| s.as_str()) != Some("0")
-                && stdout_is_terminal,
+            color: env.get("PF_COLOR").map(|s| s.as_str()) != Some("0") && stdout_is_terminal,
             sep: env.get("PF_SEP").cloned().unwrap_or_default(),
-            pad1: env
-                .get("PF_PAD1")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(0),
-            pad2: env
-                .get("PF_PAD2")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(3),
-            pad3: env
-                .get("PF_PAD3")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(1),
+            pad1: env.get("PF_PAD1").and_then(|s| s.parse().ok()).unwrap_or(0),
+            pad2: env.get("PF_PAD2").and_then(|s| s.parse().ok()).unwrap_or(3),
+            pad3: env.get("PF_PAD3").and_then(|s| s.parse().ok()).unwrap_or(1),
             user: env.get("USER").cloned(),
             hostname: env.get("HOSTNAME").cloned(),
             fast_pkg_count: env.contains_key("PF_FAST_PKG_COUNT"),
@@ -225,8 +217,7 @@ fn read_raw_logo(path: &str) -> Result<String, String> {
             .map_err(|e| format!("Could not read logo from stdin: {e}"))?;
         Ok(buffer)
     } else {
-        std::fs::read_to_string(path)
-            .map_err(|e| format!("Could not read logo file '{path}': {e}"))
+        std::fs::read_to_string(path).map_err(|e| format!("Could not read logo file '{path}': {e}"))
     }
 }
 
@@ -268,7 +259,9 @@ fn parse_pf_info(info: Option<&str>) -> Vec<PfetchInfo> {
 mod tests {
     use super::*;
 
-    fn test_env<'a>(pairs: &'a [(&'a str, &'a str)]) -> impl Iterator<Item = (String, String)> + 'a {
+    fn test_env<'a>(
+        pairs: &'a [(&'a str, &'a str)],
+    ) -> impl Iterator<Item = (String, String)> + 'a {
         pairs.iter().map(|(k, v)| (k.to_string(), v.to_string()))
     }
 
@@ -348,10 +341,7 @@ mod tests {
         assert_eq!(config.ascii, Some("openbsd".to_string()));
         assert!(config.color);
         assert_eq!(config.sep, "~");
-        assert_eq!(
-            config.info,
-            vec![PfetchInfo::Title, PfetchInfo::Os]
-        );
+        assert_eq!(config.info, vec![PfetchInfo::Title, PfetchInfo::Os]);
     }
 
     #[test]
