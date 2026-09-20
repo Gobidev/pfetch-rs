@@ -93,6 +93,29 @@ Like the original `pfetch`, `pfetch-rs` is configured through environment
 variables. Your existing config will probably still work, the main difference is
 how padding is configured.
 
+Additionally, common options can be overridden via command-line flags:
+
+```sh
+pfetch --logo openbsd
+pfetch --no-color
+pfetch --info "title os"
+pfetch --sep "~"
+pfetch --source ~/.config/pfetchrc
+pfetch --file-raw /path/to/logo.txt
+pokeget --hide-name random | pfetch --file-raw -
+```
+
+Available flags:
+
+- `-v`, `--version` — Print version
+- `-h`, `--help` — Print help
+- `-l`, `--logo`, `--ascii` — Logo to display
+- `--color` / `--no-color` — Force or disable colors
+- `--info <items>` — Space-separated list of info items
+- `--sep <string>` — Separator between label and value
+- `--source <file>` — Load environment variables from a file
+- `--file-raw <path>` — Read raw logo from file or stdin (`-`)
+
 If you want to display a custom logo, use the `PF_CUSTOM_LOGOS` option, an
 example for a custom logos file can be found below.
 

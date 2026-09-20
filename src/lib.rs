@@ -90,19 +90,17 @@ fn packages(
             &format!("{pkg_manager:?}").to_lowercase(),
         )
         .unwrap_or(0),
-        PackageManager::Rpm => match get_macchina_package_count(
+        PackageManager::Rpm => get_macchina_package_count(
             macchina_package_count,
             &format!("{pkg_manager:?}").to_lowercase(),
-        ) {
-            Some(count) => count,
-            None => {
-                if !skip_slow {
-                    run_and_count_lines("rpm", &["-qa"])
-                } else {
-                    0
-                }
+        )
+        .unwrap_or_else(|| {
+            if !skip_slow {
+                run_and_count_lines("rpm", &["-qa"])
+            } else {
+                0
             }
-        },
+        }),
         PackageManager::Guix => run_and_count_lines("guix", &["package", "--list-installed"]),
         PackageManager::Crux => {
             if check_if_command_exists("crux") {
@@ -139,23 +137,17 @@ pub fn user_at_hostname(
     username_override: &Option<String>,
     hostname_override: &Option<String>,
 ) -> Option<String> {
-    let username = match username_override {
-        Some(username) => Ok(username.to_string()),
-        None => general_readout.username(),
-    };
-    let hostname = match hostname_override {
-        Some(hostname) => Ok(hostname.to_string()),
-        None => general_readout.hostname(),
-    };
-    if username.is_err() || hostname.is_err() {
-        None
-    } else {
-        Some(format!(
-            "{}@{}",
-            username.unwrap_or_default(),
-            hostname.unwrap_or_default()
-        ))
+    let username = username_override
+        .to_owned()
+        .or_else(|| general_readout.username().ok());
+    let hostname = hostname_override
+        .to_owned()
+        .or_else(|| general_readout.hostname().ok());
+
+    if let (Some(username), Some(hostname)) = (username, hostname) {
+        return Some(format!("{username}@{hostname}"));
     }
+    None
 }
 
 pub fn memory(memory_readout: &MemoryReadout) -> Option<String> {
@@ -229,7 +221,7 @@ pub fn seconds_to_string(seconds: usize) -> String {
 }
 
 pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
-    Some(seconds_to_string(general_readout.uptime().ok()?))
+    general_readout.uptime().ok().map(seconds_to_string)
 }
 
 pub fn host(general_readout: &GeneralReadout) -> Option<String> {
@@ -299,21 +291,27 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
     }
 }
 
-fn parse_custom_logos(filename: &str) -> Vec<Option<Logo>> {
-    let file_contents = fs::read_to_string(filename).expect("Could not open custom logo file");
-    file_contents
+fn parse_custom_logos(filename: &str) -> std::result::Result<Vec<Option<Logo>>, String> {
+    let file_contents = fs::read_to_string(filename)
+        .map_err(|e| format!("Could not read custom logo file '{filename}': {e}"))?;
+    Ok(file_contents
         .split(";;")
         .map(|raw_logo| parse_logo(raw_logo).map(|(_, logo)| logo))
-        .collect::<Vec<_>>()
+        .collect::<Vec<_>>())
 }
 
-pub fn logo(logo_name: &str) -> Logo {
+pub fn logo(logo_name: &str, custom_logos: Option<&str>) -> Logo {
     let (tux, included_logos) = pfetch_extractor::parse_logos!();
     let mut logos: VecDeque<_> = included_logos.into();
-    if let Ok(filename) = dotenvy::var("PF_CUSTOM_LOGOS") {
+    if let Some(filename) = custom_logos {
         // insert custom logos in front of incuded logos
-        for custom_logo in parse_custom_logos(&filename).into_iter().flatten() {
-            logos.insert(0, custom_logo.clone());
+        match parse_custom_logos(filename) {
+            Ok(custom_logos) => {
+                for custom_logo in custom_logos.into_iter().flatten() {
+                    logos.insert(0, custom_logo);
+                }
+            }
+            Err(err) => eprintln!("Warning: {err}"),
         }
     };
     logos
@@ -321,9 +319,8 @@ pub fn logo(logo_name: &str) -> Logo {
         .find(|logo| {
             logo.pattern.split('|').any(|glob| {
                 Glob::new(glob.trim())
-                    .expect("Invalid logo pattern")
-                    .compile_matcher()
-                    .is_match(logo_name)
+                    .map(|g| g.compile_matcher().is_match(logo_name))
+                    .unwrap_or(false)
             })
         })
         .unwrap_or(tux)
@@ -357,8 +354,12 @@ pub fn de(general_readout: &GeneralReadout) -> Option<String> {
         .or_else(|| dotenvy::var("XDG_CURRENT_DESKTOP").ok())
 }
 
-pub fn palette() -> String {
-    (1..7).fold("".to_string(), |a, e| a + &format!("\x1b[4{e}m  ")) + "\x1b[0m"
+pub fn palette(color_enabled: bool) -> String {
+    if color_enabled {
+        (1..7).fold("".to_string(), |a, e| a + &format!("\x1b[4{e}m  ")) + "\x1b[0m"
+    } else {
+        "      ".to_string()
+    }
 }
 
 fn run_system_command(command: &str, args: &[&str]) -> Result<String> {

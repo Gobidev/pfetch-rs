@@ -37,6 +37,9 @@ impl FromStr for Color {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        if s.is_empty() {
+            return Err("No string given".to_string());
+        }
         Ok(Color(s.parse::<u8>().ok()))
     }
 }
