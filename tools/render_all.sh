@@ -4,7 +4,7 @@ echo "# List Of All Logos" > ../all_logos.md
 echo "Generated using \`./tools/render_all.sh\`, powered by [typst](https://typst.app)" >> ../all_logos.md
 while read -r logo; do
     echo "$logo"
-    PF_ASCII=$logo "$@" > ./tmp || exit 1
+    PF_ASCII=$logo "$@" --color > ./tmp || exit 1
     mkdir -p ../assets/logos
     typst compile -f svg renderer.typ ../assets/logos/"$logo".svg || exit 1
     echo "## $logo" >> ../all_logos.md
