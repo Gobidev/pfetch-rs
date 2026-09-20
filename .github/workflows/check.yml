@@ -58,34 +58,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bootstrap
-        uses: actions-rs/toolchain@v1
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           components: rustfmt, clippy
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
+
+      - name: Install cross
+        if: ${{ matrix.cross }}
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
 
       - name: Formatting
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          use-cross: ${{ matrix.cross }}
-        continue-on-error: false
+        run: cargo fmt --all -- --check
 
       - name: Lints
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --target=${{ matrix.target }} -- --no-deps -D clippy::all
-          use-cross: ${{ matrix.cross }}
-        continue-on-error: false
+        run: ${{ matrix.cross && 'cross' || 'cargo' }} clippy --target=${{ matrix.target }} -- --no-deps -D clippy::all
 
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --target=${{ matrix.target }} --target-dir=/tmp
-          use-cross: ${{ matrix.cross }}
+        run: ${{ matrix.cross && 'cross' || 'cargo' }} build --target=${{ matrix.target }} --target-dir=/tmp
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -94,11 +86,8 @@ jobs:
           path: /tmp/${{ matrix.target }}/debug/pfetch
 
       - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --target=${{ matrix.target }}
         if: ${{ !matrix.cross }}
+        run: cargo test --target=${{ matrix.target }}
   render:
     needs: checks
     runs-on: ubuntu-latest
