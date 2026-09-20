@@ -20,8 +20,8 @@ dragonfly
 elementary
 endeavour
 fedora
-fiwix
 finix
+fiwix
 freebsd
 garuda
 gentoo
