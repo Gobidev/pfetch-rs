@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, env, fs, io::Result, process::Command};
+use std::{collections::VecDeque, env, fs, io::Result, path::PathBuf, process::Command};
 
 use glob::glob;
 use globset::Glob;
@@ -233,8 +233,12 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
     }
 }
 
+pub fn expand_tilde(path: &str) -> PathBuf {
+    PathBuf::from(shellexpand::tilde(path).into_owned())
+}
+
 fn parse_custom_logos(filename: &str) -> std::result::Result<Vec<Option<Logo>>, String> {
-    let file_contents = fs::read_to_string(filename)
+    let file_contents = fs::read_to_string(expand_tilde(filename))
         .map_err(|e| format!("Could not read custom logo file '{filename}': {e}"))?;
     Ok(file_contents
         .split(";;")
@@ -379,5 +383,31 @@ mod tests {
     fn test_count_status_packages() {
         let status = "Package: foo\nVersion: 1\n\nPackage: bar\nVersion: 2\n";
         assert_eq!(count_status_packages(status), 2);
+    }
+
+    #[test]
+    fn test_expand_tilde() {
+        let home = PathBuf::from(shellexpand::tilde("~").into_owned());
+        assert_eq!(expand_tilde("~"), home);
+        assert_eq!(
+            expand_tilde("~/.config/pfetch/logos.txt"),
+            home.join(".config/pfetch/logos.txt")
+        );
+    }
+
+    #[test]
+    fn test_expand_tilde_leaves_other_paths_unchanged() {
+        assert_eq!(
+            expand_tilde("/etc/pfetch/logos.txt"),
+            PathBuf::from("/etc/pfetch/logos.txt")
+        );
+        assert_eq!(
+            expand_tilde("relative/logos.txt"),
+            PathBuf::from("relative/logos.txt")
+        );
+        assert_eq!(
+            expand_tilde("~user/logos.txt"),
+            PathBuf::from("~user/logos.txt")
+        );
     }
 }

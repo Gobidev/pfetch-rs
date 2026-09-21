@@ -174,3 +174,34 @@ fn missing_custom_logos_warns_and_continues() {
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Could not read custom logo file"));
 }
+
+// Windows ignores the HOME override used below
+#[cfg(not(windows))]
+#[test]
+fn tilde_custom_logos_path_is_expanded() {
+    let dir = std::env::temp_dir().join(format!("pfetch_tilde_logos_{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        dir.join("logos.txt"),
+        "[Tt]ilde*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}TILDE\n\tEOF\n\t;;\n",
+    )
+    .unwrap();
+
+    let output = pfetch()
+        .env("HOME", &dir)
+        .env("PF_CUSTOM_LOGOS", "~/logos.txt")
+        .args(["--logo", "tilde", "--info", "ascii title"])
+        .output()
+        .unwrap();
+
+    std::fs::remove_dir_all(&dir).ok();
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stderr.contains("Could not read custom logo file"),
+        "tilde path was not expanded, stderr: {stderr}"
+    );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(output.status.success());
+    assert!(stdout.contains("TILDE"), "stdout: {stdout}");
+}

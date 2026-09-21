@@ -108,7 +108,7 @@ impl Config {
             .clone()
             .or_else(|| dotenvy::var("PF_SOURCE").ok());
         if let Some(filepath) = source {
-            let _ = dotenvy::from_path(filepath);
+            let _ = dotenvy::from_path(pfetch::expand_tilde(&filepath));
         }
         let stdout_is_terminal = std::io::stdout().is_terminal();
         Self::from_env(std::env::vars(), args, stdout_is_terminal)
@@ -217,7 +217,8 @@ fn read_raw_logo(path: &str) -> Result<String, String> {
             .map_err(|e| format!("Could not read logo from stdin: {e}"))?;
         Ok(buffer)
     } else {
-        std::fs::read_to_string(path).map_err(|e| format!("Could not read logo file '{path}': {e}"))
+        std::fs::read_to_string(pfetch::expand_tilde(path))
+            .map_err(|e| format!("Could not read logo file '{path}': {e}"))
     }
 }
 

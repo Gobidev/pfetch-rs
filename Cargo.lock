@@ -834,6 +834,7 @@ dependencies = [
  "os-release",
  "pfetch-extractor",
  "pfetch-logo-parser",
+ "shellexpand",
  "unicode-width",
  "which",
 ]
@@ -1006,6 +1007,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
+]
+
+[[package]]
+name = "shellexpand"
+version = "3.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32824fab5e16e6c4d86dc1ba84489390419a39f97699852b66480bb87d297ed8"
+dependencies = [
+ "dirs",
 ]
 
 [[package]]

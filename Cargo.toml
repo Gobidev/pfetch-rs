@@ -19,6 +19,7 @@ pfetch-logo-parser = { path = "./pfetch-logo-parser", version = "0.1.2" }
 pfetch-extractor = { path = "./pfetch-extractor", version = "0.2.4" }
 globset = "0.4.10"
 dotenvy = "0.15.6"
+shellexpand = "3"
 glob = "0.3.1"
 which = "8"
 libmacchina = "8.1.0"
