@@ -6,7 +6,7 @@ use libmacchina::{
     traits::PackageManager, traits::PackageReadout as _, GeneralReadout, KernelReadout,
     MemoryReadout, PackageReadout,
 };
-use pfetch_logo_parser::{parse_logo, Logo};
+use pfetch_logo_parser::{try_parse_logo, Logo};
 
 /// Obtain the amount of installed packages on the system by checking all installed supported package
 /// managers and adding the amounts
@@ -236,13 +236,20 @@ pub fn expand_tilde(path: &str) -> PathBuf {
     PathBuf::from(shellexpand::tilde(path).into_owned())
 }
 
-fn parse_custom_logos(filename: &str) -> std::result::Result<Vec<Option<Logo>>, String> {
+fn parse_custom_logos(filename: &str) -> std::result::Result<Vec<Logo>, String> {
     let file_contents = fs::read_to_string(expand_tilde(filename))
         .map_err(|e| format!("Could not read custom logo file '{filename}': {e}"))?;
     Ok(file_contents
         .split(";;")
-        .map(|raw_logo| parse_logo(raw_logo).map(|(_, logo)| logo))
-        .collect::<Vec<_>>())
+        .filter_map(|raw_logo| match try_parse_logo(raw_logo) {
+            Ok(Some((_, logo))) => Some(logo),
+            Ok(None) => None,
+            Err(err) => {
+                eprintln!("Warning: Invalid custom logo in '{filename}': {err}");
+                None
+            }
+        })
+        .collect())
 }
 
 pub fn logo(logo_name: &str, custom_logos: Option<&str>) -> Logo {
@@ -252,7 +259,7 @@ pub fn logo(logo_name: &str, custom_logos: Option<&str>) -> Logo {
         // insert custom logos in front of incuded logos
         match parse_custom_logos(filename) {
             Ok(custom_logos) => {
-                for custom_logo in custom_logos.into_iter().flatten() {
+                for custom_logo in custom_logos {
                     logos.insert(0, custom_logo);
                 }
             }

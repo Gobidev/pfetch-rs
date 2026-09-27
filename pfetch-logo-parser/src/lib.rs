@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use std::{borrow::Cow, fmt::Display, str::FromStr};
+use std::{borrow::Cow, fmt::Display, str::FromStr, sync::OnceLock};
 
 #[cfg(feature = "proc-macro")]
 use proc_macro2::TokenStream;
@@ -40,7 +40,9 @@ impl FromStr for Color {
         if s.is_empty() {
             return Err("No string given".to_string());
         }
-        Ok(Color(s.parse::<u8>().ok()))
+        s.parse::<u8>()
+            .map(|value| Color(Some(value)))
+            .map_err(|_| format!("'{s}' is not a valid color (expected a number)"))
     }
 }
 
@@ -93,43 +95,60 @@ impl ToTokens for Logo {
 
 impl Display for Logo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.logo_parts
-                .iter()
-                .fold("".to_string(), |a, LogoPart { color, content }| a
-                    + &if !f.alternate() {
-                        format!("{color}{content}")
-                    } else {
-                        format!("{content}")
-                    })
-        )
+        for LogoPart { color, content } in self.logo_parts.iter() {
+            if f.alternate() {
+                write!(f, "{content}")?;
+            } else {
+                write!(f, "{color}{content}")?;
+            }
+        }
+        Ok(())
     }
 }
 
-/// Parses a logo in pfetch formant and returns wether it is the linux (tux) logo and the logo itself
+fn logo_regex() -> &'static Regex {
+    static LOGO_REGEX: OnceLock<Regex> = OnceLock::new();
+    LOGO_REGEX.get_or_init(|| Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d)?").unwrap())
+}
+
+/// Parses a logo in pfetch format.
+///
+/// Panics on invalid input; use [`try_parse_logo`] for untrusted input.
 pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
+    try_parse_logo(input).unwrap_or_else(|err| panic!("{err}"))
+}
+
+/// Fallible version of [`parse_logo`]; returns `Ok(None)` for empty input.
+pub fn try_parse_logo(input: &str) -> Result<Option<(bool, Logo)>, String> {
     let input = input.trim().replace('\t', "");
     if input.is_empty() {
-        return None;
+        return Ok(None);
     }
-    let regex = Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d)?").unwrap();
+    let regex = logo_regex();
 
-    let groups = regex.captures(&input).expect("Error while parsing logo");
+    let groups = regex
+        .captures(&input)
+        .ok_or_else(|| "Error while parsing logo".to_string())?;
 
     let pattern = &groups[1];
     let primary_color = match groups.get(2) {
-        Some(color) => color.as_str().parse::<u8>().unwrap(),
+        Some(color) => color
+            .as_str()
+            .parse::<u8>()
+            .map_err(|_| format!("Invalid color: {}", color.as_str()))?,
         None => 7,
     };
     let secondary_color = (primary_color + 1) % 8;
     let logo = input
         .split_once("EOF\n")
-        .expect("Could not find start of logo, make sure to include the `<<- EOF` and to use tabs for indentation")
+        .ok_or_else(|| {
+            "Could not find start of logo, make sure to include the `<<- EOF` and to use tabs for indentation".to_string()
+        })?
         .1
         .split_once("\nEOF")
-        .expect("Could not find end of logo, make sure to include the closing EOF and to use tabs for indentation")
+        .ok_or_else(|| {
+            "Could not find end of logo, make sure to include the closing EOF and to use tabs for indentation".to_string()
+        })?
         .0;
 
     let mut logo_parts = vec![];
@@ -138,7 +157,7 @@ pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
             let new_color: u8 = new_color
                 .get(1..)
                 .and_then(|num| num.parse().ok())
-                .unwrap_or_else(|| panic!("Invalid color: {new_color}"));
+                .ok_or_else(|| format!("Invalid color: {new_color}"))?;
             let rest = rest.replace("\\\\", "\\");
             let rest = rest.replace("\\`", "`");
             let lines = rest.split('\n').collect::<Vec<_>>();
@@ -162,7 +181,7 @@ pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
         }
     }
 
-    Some((
+    Ok(Some((
         pattern == "[Ll]inux*",
         Logo {
             primary_color: Color(Some(primary_color)),
@@ -170,5 +189,81 @@ pub fn parse_logo(input: &str) -> Option<(bool, Logo)> {
             pattern: pattern.to_owned().into(),
             logo_parts: logo_parts.into(),
         },
-    ))
+    )))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SAMPLE: &str =
+        "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}  /\\\n\t\t${c1} /  \\\n\tEOF\n";
+
+    #[test]
+    fn test_parse_logo() {
+        let (is_tux, logo) = parse_logo(SAMPLE).unwrap();
+        assert!(!is_tux);
+        assert_eq!(logo.pattern, "[Aa]rch*");
+        assert_eq!(logo.primary_color.0, Some(1));
+        assert_eq!(logo.secondary_color.0, Some(2));
+        assert!(!logo.logo_parts.is_empty());
+    }
+
+    #[test]
+    fn test_parse_tux_logo() {
+        let input = "[Ll]inux*)\n\tread_ascii 6 <<- EOF\n\t\t${c6}TUX\n\tEOF\n";
+        let (is_tux, logo) = parse_logo(input).unwrap();
+        assert!(is_tux);
+        assert_eq!(logo.primary_color.0, Some(6));
+    }
+
+    #[test]
+    fn test_logo_display() {
+        let (_, logo) = parse_logo(SAMPLE).unwrap();
+
+        let colored = logo.to_string();
+        let plain = format!("{logo:#}");
+
+        assert!(colored.contains("\x1b[31m"));
+        assert!(!plain.contains('\x1b'));
+        assert_eq!(colored.replace("\x1b[31m", ""), plain);
+    }
+
+    #[test]
+    fn test_parse_logo_empty() {
+        assert!(try_parse_logo(" \n\t").unwrap().is_none());
+        assert!(parse_logo("").is_none());
+    }
+
+    #[test]
+    fn test_try_parse_logo_missing_eof() {
+        let err =
+            try_parse_logo("[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}  /\\\n").unwrap_err();
+        assert!(err.contains("Could not find end of logo"), "{err}");
+    }
+
+    #[test]
+    fn test_try_parse_logo_missing_read_ascii() {
+        let err = try_parse_logo("[Aa]rch*)").unwrap_err();
+        assert!(err.contains("Error while parsing logo"), "{err}");
+    }
+
+    #[test]
+    fn test_try_parse_logo_missing_start_of_logo() {
+        let err = try_parse_logo("[Aa]rch*)\n\tread_ascii 1").unwrap_err();
+        assert!(err.contains("Could not find start of logo"), "{err}");
+    }
+
+    #[test]
+    fn test_try_parse_logo_invalid_color() {
+        let input = "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${cx}  /\\\n\tEOF\n";
+        let err = try_parse_logo(input).unwrap_err();
+        assert!(err.contains("Invalid color"), "{err}");
+    }
+
+    #[test]
+    fn test_parse_logo_panics_on_invalid_input() {
+        let result = std::panic::catch_unwind(|| parse_logo("[Aa]rch*)"));
+        assert!(result.is_err());
+    }
 }
