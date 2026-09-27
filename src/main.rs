@@ -18,10 +18,10 @@ struct Readouts {
     kernel_readout: KernelReadout,
 }
 
-fn get_info(info: &PfetchInfo, readouts: &Readouts, config: &Config) -> Option<String> {
+fn get_info(info: &PfetchInfo, readouts: &Readouts, config: &Config, os: &str) -> Option<String> {
     match info {
         PfetchInfo::Ascii => None,
-        PfetchInfo::Os => pfetch::os(&readouts.general_readout),
+        PfetchInfo::Os => (!os.is_empty()).then(|| os.to_owned()),
         PfetchInfo::Title => {
             pfetch::user_at_hostname(&readouts.general_readout, &config.user, &config.hostname)
         }
@@ -93,7 +93,7 @@ fn main() {
         .info
         .iter()
         .filter_map(|info| {
-            get_info(info, &readouts, &config).map(|info_str| match info {
+            get_info(info, &readouts, &config, &os).map(|info_str| match info {
                 PfetchInfo::Title => (logo.secondary_color, info_str, "".to_string()),
                 PfetchInfo::BlankLine => (logo.primary_color, "".to_string(), "".to_string()),
                 PfetchInfo::Palette => (logo.primary_color, info_str, "".to_string()),

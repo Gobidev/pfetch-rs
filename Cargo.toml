@@ -17,7 +17,6 @@ categories = ["command-line-utilities"]
 [dependencies]
 pfetch-logo-parser = { path = "./pfetch-logo-parser", version = "0.1.2" }
 pfetch-extractor = { path = "./pfetch-extractor", version = "0.2.4" }
-globset = "0.4.10"
 dotenvy = "0.15.6"
 shellexpand = "3"
 glob = "0.3.1"
@@ -26,6 +25,11 @@ libmacchina = "8.1.0"
 crossterm = "0.28.1"
 os-release = "0.1.0"
 unicode-width = "0.2.0"
+# static sqlite: avoids loading libsqlite3.so at startup
+sqlite3-src = { version = "0.6.1", features = ["bundled"] }
 
 [profile.release]
 strip = true
+lto = "fat"
+codegen-units = 1
+panic = "abort"

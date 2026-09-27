@@ -1,7 +1,6 @@
 use std::{collections::VecDeque, env, fs, io::Result, path::PathBuf, process::Command};
 
 use glob::glob;
-use globset::Glob;
 use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
     traits::PackageManager, traits::PackageReadout as _, GeneralReadout, KernelReadout,
@@ -32,7 +31,7 @@ fn fallback_packages(counts: &[(PackageManager, usize)], skip_slow: bool) -> usi
     let mut total = 0;
 
     // rpm: use the CLI when libmacchina cannot read its database
-    if !has_rpm && !skip_slow {
+    if !has_rpm && !skip_slow && check_if_command_exists("rpm") {
         total += run_and_count_lines("rpm", &["-qa"]);
     }
 
@@ -264,8 +263,8 @@ pub fn logo(logo_name: &str, custom_logos: Option<&str>) -> Logo {
         .into_iter()
         .find(|logo| {
             logo.pattern.split('|').any(|glob| {
-                Glob::new(glob.trim())
-                    .map(|g| g.compile_matcher().is_match(logo_name))
+                glob::Pattern::new(glob.trim())
+                    .map(|g| g.matches(logo_name))
                     .unwrap_or(false)
             })
         })
