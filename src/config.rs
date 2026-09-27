@@ -68,6 +68,7 @@ impl FromStr for PfetchInfo {
             "wm" => Ok(PfetchInfo::Wm),
             "de" => Ok(PfetchInfo::De),
             "palette" => Ok(PfetchInfo::Palette),
+            "blankline" => Ok(PfetchInfo::BlankLine),
             unknown_info => Err(format!("Unknown pfetch info: {unknown_info}")),
         }
     }
@@ -108,7 +109,9 @@ impl Config {
             .clone()
             .or_else(|| dotenvy::var("PF_SOURCE").ok());
         if let Some(filepath) = source {
-            let _ = dotenvy::from_path(pfetch::expand_tilde(&filepath));
+            if let Err(err) = dotenvy::from_path(pfetch::expand_tilde(&filepath)) {
+                eprintln!("Warning: Could not load source file '{filepath}': {err}");
+            }
         }
         let stdout_is_terminal = std::io::stdout().is_terminal();
         Self::from_env(std::env::vars(), args, stdout_is_terminal)
@@ -147,8 +150,15 @@ impl Config {
     ) -> Self {
         let env: HashMap<String, String> = env.collect();
 
-        let parse_color =
-            |key: &str| -> Option<Color> { env.get(key).and_then(|s| Color::from_str(s).ok()) };
+        let parse_color = |key: &str| -> Option<Color> {
+            env.get(key).and_then(|s| match Color::from_str(s) {
+                Ok(color) => Some(color),
+                Err(err) => {
+                    eprintln!("Warning: Ignoring {key}: {err}");
+                    None
+                }
+            })
+        };
 
         let col1 = parse_color("PF_COL1");
         let col3_is_col1 = env.get("PF_COL3").map(|s| s.as_str()) == Some("COL1");
@@ -311,6 +321,29 @@ mod tests {
         assert!(config.col3_is_col1);
         assert_eq!(config.col1.map(|c| c.0), Some(Some(4)));
         assert!(config.col3.is_none());
+    }
+
+    #[test]
+    fn test_config_invalid_color_is_ignored() {
+        let config = Config::from_env(
+            test_env(&[("PF_COL1", "not-a-color")]),
+            Args::default(),
+            true,
+        );
+        assert!(config.col1.is_none());
+    }
+
+    #[test]
+    fn test_config_blankline_info() {
+        let config = Config::from_env(
+            test_env(&[("PF_INFO", "title blankline os")]),
+            Args::default(),
+            true,
+        );
+        assert_eq!(
+            config.info,
+            vec![PfetchInfo::Title, PfetchInfo::BlankLine, PfetchInfo::Os]
+        );
     }
 
     #[test]
