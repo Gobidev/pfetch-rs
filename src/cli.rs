@@ -78,15 +78,15 @@ pub fn print_help() {
     println!("Usage: pfetch [OPTIONS]");
     println!();
     println!("Options:");
-    println!("  -v, --version            Print version");
-    println!("  -h, --help               Print help");
-    println!("  -l, --logo, --ascii      Logo to display");
-    println!("      --color              Force colors");
-    println!("      --no-color           Disable colors");
-    println!("      --info <items>       Info items to display");
-    println!("      --sep <string>       Separator between label and value");
-    println!("      --source <file>      Load environment from file");
-    println!("      --file-raw <path>    Read raw logo from file or stdin (-)");
+    println!("  -v, --version                Print version");
+    println!("  -h, --help                   Print help");
+    println!("  -l, --logo, --ascii <name>   Logo to display");
+    println!("      --color                  Force colors");
+    println!("      --no-color               Disable colors");
+    println!("      --info <items>           Info items to display");
+    println!("      --sep <string>           Separator between label and value");
+    println!("      --source <file>          Load environment from file");
+    println!("      --file-raw <path>        Read raw logo from file or stdin (-)");
 }
 
 #[cfg(test)]
