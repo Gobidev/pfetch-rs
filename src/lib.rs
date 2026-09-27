@@ -192,7 +192,6 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
                 "�",
                 "os",
                 "Type1ProductConfigId",
-                "",
             ];
 
             // get device from system files
@@ -207,7 +206,7 @@ pub fn host(general_readout: &GeneralReadout) -> Option<String> {
             let product_model = product_model.trim();
 
             let final_str = format!("{product_name} {product_version} {product_model}")
-                .split(' ')
+                .split_whitespace()
                 .filter(|word| !BLACKLIST.contains(word))
                 .collect::<Vec<_>>()
                 .join(" ");

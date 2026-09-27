@@ -1,5 +1,6 @@
 use crate::config::Config;
 use pfetch_logo_parser::{Color, Logo, LogoPart};
+use std::fmt::Write as _;
 use unicode_width::UnicodeWidthStr;
 
 pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool, config: &Config) {
@@ -52,6 +53,7 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
     };
 
     let mut output = String::new();
+    let pad1 = " ".repeat(config.pad1);
 
     for l in 0..line_amount {
         let (line_color, info1, info2) =
@@ -59,7 +61,7 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
                 (*c, i1.as_str(), i2.as_str())
             });
 
-        output.push_str(&" ".repeat(config.pad1));
+        output.push_str(&pad1);
         output.push_str(bold);
         if logo_enabled {
             output.push_str(display_lines.get(l).map_or("", |s| s.as_str()));
@@ -68,10 +70,10 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
         let current_width = width_per_line.get(l).copied().unwrap_or(0);
         let padding2 =
             logo_width.saturating_sub(current_width) + if logo_enabled { config.pad2 } else { 0 };
-        output.push_str(&" ".repeat(padding2));
+        push_spaces(&mut output, padding2);
 
         if config.color {
-            output.push_str(&line_color.to_string());
+            let _ = write!(output, "{line_color}");
         }
         output.push_str(info1);
         output.push_str(reset);
@@ -81,7 +83,7 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
         }
 
         let padding3 = info1_width.saturating_sub(info1.len()) + config.pad3;
-        output.push_str(&" ".repeat(padding3));
+        push_spaces(&mut output, padding3);
 
         if config.color {
             output.push_str(&col2_str);
@@ -98,6 +100,12 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
 
     if config.stdout_is_terminal {
         let _ = crossterm::execute!(std::io::stdout(), crossterm::terminal::EnableLineWrap);
+    }
+}
+
+fn push_spaces(output: &mut String, amount: usize) {
+    for _ in 0..amount {
+        output.push(' ');
     }
 }
 
