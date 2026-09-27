@@ -1,6 +1,6 @@
 on: [push, pull_request]
 permissions:
-  contents: write
+  contents: read
 name: CI
 
 env:
@@ -87,9 +87,12 @@ jobs:
 
       - name: Test
         if: ${{ !matrix.cross }}
-        run: cargo test --target=${{ matrix.target }}
+        run: cargo test --workspace --target=${{ matrix.target }}
   render:
     needs: checks
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
