@@ -124,17 +124,17 @@ Install the [pfetch-rs](https://aur.archlinux.org/packages/pfetch-rs) or
 
 ## Performance
 
-Benchmarks performed on an AMD Ryzen 5 3600. Execution time is measured using
+Benchmarks performed on an AMD Ryzen 5 7640U. Execution time is measured using
 [hyperfine](https://github.com/sharkdp/hyperfine) with `-w 4 -m 500 -N` flags.
 
 |  Implementation   | Mean [ms]  | Min [ms] | Max [ms] |
 | :---------------: | :--------: | :------: | :------: |
-| POSIX `sh` (bash) | 23.7 ± 0.9 |   22.3   |   29.3   |
-| POSIX `sh` (dash) | 15.9 ± 0.3 |   15.1   |   18.2   |
-|   Rust (v2.3.0)   | 2.2 ± 0.2  |   1.8    |   3.9    |
+| POSIX `sh` (bash) | 39.0 ± 1.3 |   35.1   |   42.7   |
+| POSIX `sh` (dash) | 30.1 ± 1.1 |   27.0   |   34.7   |
+|   Rust (v3.0.1)   | 2.4 ± 0.4  |   1.7    |   3.9    |
 
-_Note: This is with `pacman` and `flatpak` being the only installed package
-managers. For more info, see [Improving Performance](#imp_perf)._
+_Note: This is with `pacman`, `flatpak` and `cargo` being the only counted
+package managers. For more info, see [Improving Performance](#imp_perf)._
 
 <a name="imp_perf"></a>
 
