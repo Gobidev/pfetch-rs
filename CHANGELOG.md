@@ -1,5 +1,36 @@
 # Changelog
 
+## [3.0.1] - 2026-09-28
+
+### Bug Fixes
+
+- Expand filepaths containing `~`
+- Warn instead of panic on invalid custom logos
+- Improve validation and blankline support
+
+### Documentation
+
+- Show option arguments in --help
+- Refresh benchmarks
+
+### Miscellaneous
+
+- Remove unused proc-macro2 dependency
+- Update dependencies
+
+### Performance
+
+- Speed up logo matching and startup
+
+### Refactor
+
+- Simplify host detection and rendering
+
+### Ci
+
+- Fix release workflow
+- Run workspace tests and only render logos on push
+
 ## [3.0.0] - 2026-09-20
 
 ### Documentation

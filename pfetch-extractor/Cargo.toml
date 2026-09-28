@@ -1,6 +1,6 @@
 [package]
 name = "pfetch-extractor"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["Gobidev"]
 edition = "2021"
 keywords = ["pfetch"]
@@ -13,5 +13,5 @@ proc-macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pfetch-logo-parser = { version = "0.1.1", path = "../pfetch-logo-parser", features = ["proc-macro"] }
+pfetch-logo-parser = { version = "0.2.0", path = "../pfetch-logo-parser", features = ["proc-macro"] }
 quote = "1.0.23"
