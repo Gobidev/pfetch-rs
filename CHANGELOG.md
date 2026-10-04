@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.2] - 2026-10-04
+
+### Features
+
+- Make sqlite bundling opt-out
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [3.0.1] - 2026-09-28
 
 ### Bug Fixes
