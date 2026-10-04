@@ -105,6 +105,9 @@ Download a binary from the
 cargo install pfetch
 ```
 
+SQLite is bundled by default. Packagers can link the system library instead
+with `cargo build --release --no-default-features`.
+
 ### Homebrew
 
 ```sh

@@ -26,7 +26,11 @@ crossterm = "0.28.1"
 os-release = "0.1.0"
 unicode-width = "0.2.0"
 # static sqlite: avoids loading libsqlite3.so at startup
-sqlite3-src = { version = "0.6.1", features = ["bundled"] }
+sqlite3-src = { version = "0.6.1", features = ["bundled"], optional = true }
+
+[features]
+default = ["bundled-sqlite"]
+bundled-sqlite = ["dep:sqlite3-src"]
 
 [profile.release]
 strip = true
