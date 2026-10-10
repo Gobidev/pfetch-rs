@@ -78,6 +78,7 @@ Solaris,
 Ubuntu,
 Vanilla OS _(new)_,
 Void Linux,
+Vylen Linux,
 Windows _(new)_,
 Xeonix Linux
 
