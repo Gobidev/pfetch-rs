@@ -198,6 +198,9 @@ Generated using `./tools/render_all.sh`, powered by [typst](https://typst.app)
 ## void
 <img src="./assets/logos/void.svg" width="230">
 
+## vylen
+<img src="./assets/logos/vylen.svg" width="230">
+
 ## windows
 <img src="./assets/logos/windows.svg" width="230">
 
