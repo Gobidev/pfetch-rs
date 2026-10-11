@@ -56,6 +56,11 @@ fn fallback_packages(counts: &[(PackageManager, usize)], skip_slow: bool) -> usi
             total += files.count();
         }
     }
+    if check_if_command_exists("emerald") {
+        if let Ok(files) = glob("/var/lib/emerald/db/*") {
+            total += files.count();
+        }
+    }
 
     total
 }
