@@ -800,8 +800,8 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
-    [Vv]anilla*)
-        read_ascii 3 <<- EOF
+	[Vv]anilla*)
+	    read_ascii 3 <<- EOF
 				${c3}        .#.
 				${c3}       :#=#:
 				${c3}.#=":.:##=##:.:"=#.
@@ -827,7 +827,7 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
         ;;
 
     [Vv]ylen*)
-        read_ascii 2 <<-EOF
+        read_ascii 2 <<- EOF
 				     ${c2}:^::^~ ~^::^:
 				   :^:   .~ ~.   :^:
 				.:^.     .~ ~.     .^:.
