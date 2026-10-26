@@ -194,6 +194,14 @@ PF_INFO="ascii"
 # Example: Only Information.
 PF_INFO="title os host kernel uptime pkgs memory"
 
+# Which Host fields to display (Linux only).
+# Default: name version model
+# Valid: space separated list of name, version, model
+# Shown in the given order; unknown values are ignored.
+# name and version come from DMI; model comes from the devicetree.
+# Set to an empty value to hide the host info.
+PF_HOST="name version model"
+
 # A file containing environment variables to source before running pfetch
 # Default: unset
 # Valid: A shell script

@@ -25,7 +25,9 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts, config: &Config, os: &str) -
         PfetchInfo::Title => {
             pfetch::user_at_hostname(&readouts.general_readout, &config.user, &config.hostname)
         }
-        PfetchInfo::Host => pfetch::host(&readouts.general_readout),
+        PfetchInfo::Host => {
+            pfetch::host_with_fields(&readouts.general_readout, &config.host_fields)
+        }
         PfetchInfo::Kernel => pfetch::kernel(&readouts.kernel_readout),
         PfetchInfo::Uptime => pfetch::uptime(&readouts.general_readout),
         PfetchInfo::Pkgs => Some(

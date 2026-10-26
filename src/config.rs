@@ -1,4 +1,5 @@
 use crate::cli::Args;
+use pfetch::HostField;
 use pfetch_logo_parser::Color;
 use std::{
     collections::HashMap,
@@ -91,6 +92,7 @@ pub struct Config {
     pub hostname: Option<String>,
     pub fast_pkg_count: bool,
     pub info: Vec<PfetchInfo>,
+    pub host_fields: Vec<HostField>,
     pub custom_logos: Option<String>,
     pub raw_logo: Option<String>,
     pub print_version: bool,
@@ -134,6 +136,7 @@ impl Config {
             hostname: None,
             fast_pkg_count: false,
             info: Vec::new(),
+            host_fields: HostField::ALL.to_vec(),
             custom_logos: None,
             raw_logo: None,
             print_version: args.print_version,
@@ -184,6 +187,7 @@ impl Config {
             hostname: env.get("HOSTNAME").cloned(),
             fast_pkg_count: env.contains_key("PF_FAST_PKG_COUNT"),
             info: parse_pf_info(env.get("PF_INFO").map(|s| s.as_str())),
+            host_fields: parse_pf_host(env.get("PF_HOST").map(|s| s.as_str())),
             custom_logos: env.get("PF_CUSTOM_LOGOS").cloned(),
             raw_logo: None,
             print_version: args.print_version,
@@ -266,6 +270,16 @@ fn parse_pf_info(info: Option<&str>) -> Vec<PfetchInfo> {
     with_blanks
 }
 
+fn parse_pf_host(host: Option<&str>) -> Vec<HostField> {
+    match host {
+        Some(fields) => fields
+            .split_whitespace()
+            .filter_map(|field| field.parse().ok())
+            .collect(),
+        None => HostField::ALL.to_vec(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -344,6 +358,43 @@ mod tests {
             config.info,
             vec![PfetchInfo::Title, PfetchInfo::BlankLine, PfetchInfo::Os]
         );
+    }
+
+    #[test]
+    fn test_config_default_host_fields() {
+        let config = Config::from_env(test_env(&[]), Args::default(), true);
+        assert_eq!(config.host_fields, HostField::ALL.to_vec());
+    }
+
+    #[test]
+    fn test_config_host_fields() {
+        let config = Config::from_env(
+            test_env(&[("PF_HOST", "  version\tmodel ")]),
+            Args::default(),
+            true,
+        );
+        assert_eq!(
+            config.host_fields,
+            vec![HostField::Version, HostField::Model]
+        );
+    }
+
+    #[test]
+    fn test_config_invalid_host_fields_are_ignored() {
+        let config = Config::from_env(
+            test_env(&[("PF_HOST", "name bogus")]),
+            Args::default(),
+            true,
+        );
+        assert_eq!(config.host_fields, vec![HostField::Name]);
+    }
+
+    #[test]
+    fn test_config_empty_host_fields() {
+        for value in ["", "   "] {
+            let config = Config::from_env(test_env(&[("PF_HOST", value)]), Args::default(), true);
+            assert!(config.host_fields.is_empty());
+        }
     }
 
     #[test]

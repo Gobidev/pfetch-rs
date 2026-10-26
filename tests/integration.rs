@@ -6,6 +6,7 @@ fn pfetch() -> Command {
         .unwrap_or_else(|_| String::from("target/debug/pfetch"));
     let mut cmd = Command::new(bin);
     cmd.env_remove("PF_INFO")
+        .env_remove("PF_HOST")
         .env_remove("PF_ASCII")
         .env_remove("PF_COLOR")
         .env_remove("PF_SEP")
@@ -46,6 +47,18 @@ fn info_filter() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains('@'));
     assert!(!stdout.contains("os "));
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn empty_host_fields_hide_host() {
+    let output = pfetch()
+        .env("PF_HOST", "")
+        .args(["--info", "host"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    assert!(output.stdout.is_empty());
 }
 
 #[test]

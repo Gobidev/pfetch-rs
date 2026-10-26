@@ -170,54 +170,98 @@ pub fn uptime(general_readout: &GeneralReadout) -> Option<String> {
     general_readout.uptime().ok().map(seconds_to_string)
 }
 
+/// A field shown in the `host` info item.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum HostField {
+    Name,
+    Version,
+    Model,
+}
+
+impl HostField {
+    /// All available fields, in their default display order.
+    pub const ALL: [HostField; 3] = [HostField::Name, HostField::Version, HostField::Model];
+
+    fn read(self) -> String {
+        let path = match self {
+            HostField::Name => "/sys/devices/virtual/dmi/id/product_name",
+            HostField::Version => "/sys/devices/virtual/dmi/id/product_version",
+            HostField::Model => "/sys/firmware/devicetree/base/model",
+        };
+        fs::read_to_string(path).unwrap_or_default()
+    }
+}
+
+impl std::str::FromStr for HostField {
+    type Err = String;
+
+    fn from_str(field: &str) -> std::result::Result<Self, Self::Err> {
+        match field {
+            "name" => Ok(HostField::Name),
+            "version" => Ok(HostField::Version),
+            "model" => Ok(HostField::Model),
+            unknown_field => Err(format!("Unknown host field: {unknown_field}")),
+        }
+    }
+}
+
+fn format_host(values: &[String]) -> String {
+    const BLACKLIST: &[&str] = &[
+        "To",
+        "Be",
+        "be",
+        "Filled",
+        "filled",
+        "By",
+        "by",
+        "O.E.M.",
+        "OEM",
+        "Not",
+        "Applicable",
+        "Specified",
+        "System",
+        "Product",
+        "Name",
+        "Version",
+        "Undefined",
+        "Default",
+        "string",
+        "INVALID",
+        "�",
+        "os",
+        "Type1ProductConfigId",
+    ];
+
+    values
+        .iter()
+        .flat_map(|value| value.split_whitespace())
+        .filter(|word| !BLACKLIST.contains(word))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn should_use_arch_fallback(fields: &[HostField], formatted: &str) -> bool {
+    formatted.is_empty() && fields == HostField::ALL.as_slice()
+}
+
 pub fn host(general_readout: &GeneralReadout) -> Option<String> {
+    host_with_fields(general_readout, &HostField::ALL)
+}
+
+/// On Linux, selects which host fields to show; an empty slice hides the host.
+pub fn host_with_fields(general_readout: &GeneralReadout, fields: &[HostField]) -> Option<String> {
     match env::consts::OS {
         "linux" => {
-            const BLACKLIST: &[&str] = &[
-                "To",
-                "Be",
-                "be",
-                "Filled",
-                "filled",
-                "By",
-                "by",
-                "O.E.M.",
-                "OEM",
-                "Not",
-                "Applicable",
-                "Specified",
-                "System",
-                "Product",
-                "Name",
-                "Version",
-                "Undefined",
-                "Default",
-                "string",
-                "INVALID",
-                "�",
-                "os",
-                "Type1ProductConfigId",
-            ];
+            if fields.is_empty() {
+                return None;
+            }
 
-            // get device from system files
-            let product_name =
-                fs::read_to_string("/sys/devices/virtual/dmi/id/product_name").unwrap_or_default();
-            let product_name = product_name.trim();
-            let product_version = fs::read_to_string("/sys/devices/virtual/dmi/id/product_version")
-                .unwrap_or_default();
-            let product_version = product_version.trim();
-            let product_model =
-                fs::read_to_string("/sys/firmware/devicetree/base/model").unwrap_or_default();
-            let product_model = product_model.trim();
+            let values: Vec<String> = fields.iter().map(|field| field.read()).collect();
+            let final_str = format_host(&values);
 
-            let final_str = format!("{product_name} {product_version} {product_model}")
-                .split_whitespace()
-                .filter(|word| !BLACKLIST.contains(word))
-                .collect::<Vec<_>>()
-                .join(" ");
-
-            // if string is empty, display system architecture instead
-            let final_str = if final_str.is_empty() {
+            // fall back to the architecture when the default fields are empty
+            let final_str = if should_use_arch_fallback(fields, &final_str) {
                 run_system_command("uname", &["-m"]).unwrap_or("Unknown".to_owned())
             } else {
                 final_str
@@ -419,5 +463,28 @@ mod tests {
             expand_tilde("~user/logos.txt"),
             PathBuf::from("~user/logos.txt")
         );
+    }
+
+    #[test]
+    fn test_format_host_preserves_order_and_blacklist() {
+        let values = [
+            "A5".to_string(),
+            "System Product Name".to_string(),
+            "Laptop 13".to_string(),
+        ];
+        assert_eq!(format_host(&values), "A5 Laptop 13");
+    }
+
+    #[test]
+    fn test_format_host_empty() {
+        assert_eq!(format_host(&[]), "");
+        assert_eq!(format_host(&["System Product Name".to_string()]), "");
+    }
+
+    #[test]
+    fn test_should_use_arch_fallback_only_for_default_fields() {
+        assert!(should_use_arch_fallback(&HostField::ALL, ""));
+        assert!(!should_use_arch_fallback(&[HostField::Model], ""));
+        assert!(!should_use_arch_fallback(&HostField::ALL, "Laptop"));
     }
 }
