@@ -49,6 +49,25 @@ fn info_filter() {
 }
 
 #[test]
+fn info_without_ascii_has_no_logo_padding() {
+    let output = pfetch()
+        .env("PF_PAD1", "2")
+        .args(["--info", "title os"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    assert_eq!(stdout.lines().count(), 2);
+    for line in stdout.lines() {
+        assert!(
+            line.starts_with("  ") && !line.starts_with("   "),
+            "line should only have the configured pad1 indentation: {line:?}"
+        );
+    }
+}
+
+#[test]
 fn separator_override() {
     let output = pfetch()
         .args(["--sep", "~", "--info", "title os"])

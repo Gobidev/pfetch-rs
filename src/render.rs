@@ -29,7 +29,11 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
         };
 
     let logo_width = *width_per_line.iter().max().unwrap_or(&0);
-    let line_amount = usize::max(display_lines.len(), info.len());
+    let line_amount = if logo_enabled {
+        usize::max(display_lines.len(), info.len())
+    } else {
+        info.len()
+    };
 
     let info1_width = info
         .iter()
@@ -68,8 +72,11 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
         }
 
         let current_width = width_per_line.get(l).copied().unwrap_or(0);
-        let padding2 =
-            logo_width.saturating_sub(current_width) + if logo_enabled { config.pad2 } else { 0 };
+        let padding2 = if logo_enabled {
+            logo_width.saturating_sub(current_width) + config.pad2
+        } else {
+            0
+        };
         push_spaces(&mut output, padding2);
 
         if config.color {
