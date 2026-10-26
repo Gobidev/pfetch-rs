@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.1.0] - 2026-10-26
+
+### Bug Fixes
+
+- Align info when ascii field is omitted
+
+### Features
+
+- Add Vylen Linux logo (#80)
+- Add PF_HOST field selection
+
+### Miscellaneous
+
+- Update dependencies
+
 ## [3.0.2] - 2026-10-04
 
 ### Features

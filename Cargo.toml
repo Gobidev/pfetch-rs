@@ -3,7 +3,7 @@ members = ["pfetch-extractor", "pfetch-logo-parser"]
 
 [package]
 name = "pfetch"
-version = "3.0.2"
+version = "3.1.0"
 edition = "2021"
 authors = ["Gobidev"]
 description = "A rewrite of the pfetch system information tool"
