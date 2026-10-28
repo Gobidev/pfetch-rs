@@ -183,7 +183,7 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
-    [Cc]rystal*[Ll]inux)
+    [Cc]rystal*[Ll]inux*)
         read_ascii 5 <<- EOF
 				${c5}        -//.
 				${c5}      -//.
