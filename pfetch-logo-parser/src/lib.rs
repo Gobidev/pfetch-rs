@@ -27,8 +27,8 @@ impl Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.0 {
             Some(color @ 0..=7) => write!(f, "\x1b[3{color}m"),
+            Some(9) | None => write!(f, "\x1b[39m"),
             Some(color) => write!(f, "\x1b[38;5;{color}m"),
-            None => write!(f, "\x1b[39m"),
         }
     }
 }
@@ -198,6 +198,22 @@ mod tests {
 
     const SAMPLE: &str =
         "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}  /\\\n\t\t${c1} /  \\\n\tEOF\n";
+
+    #[test]
+    fn test_color_to_string() {
+        let cases = [
+            (Some(0), "\x1b[30m"),
+            (Some(7), "\x1b[37m"),
+            (Some(8), "\x1b[38;5;8m"),
+            (Some(9), "\x1b[39m"),
+            (Some(10), "\x1b[38;5;10m"),
+            (Some(255), "\x1b[38;5;255m"),
+            (None, "\x1b[39m"),
+        ];
+        for (value, expected) in cases {
+            assert_eq!(Color(value).to_string(), expected);
+        }
+    }
 
     #[test]
     fn test_parse_logo() {
