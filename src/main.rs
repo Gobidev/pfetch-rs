@@ -45,22 +45,20 @@ fn get_info(info: &PfetchInfo, readouts: &Readouts, config: &Config, os: &str) -
 }
 
 fn main() {
-    let config = Config::load();
+    let args = cli::parse_args();
 
-    if config.print_version {
+    if args.print_version {
         println!("pfetch-rs {}", env!("CARGO_PKG_VERSION"));
         std::process::exit(0);
     }
 
-    if config.print_help {
-        cli::print_unknown_args(&config.args);
+    if args.print_help {
+        cli::print_unknown_args(&args);
         cli::print_help();
-        std::process::exit(if config.args.unknown_args.is_empty() {
-            0
-        } else {
-            1
-        });
+        std::process::exit(if args.unknown_args.is_empty() { 0 } else { 1 });
     }
+
+    let config = Config::load(args);
 
     let general_readout = GeneralReadout::new();
     let os = pfetch::os(&general_readout).unwrap_or_default();

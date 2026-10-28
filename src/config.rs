@@ -77,7 +77,6 @@ impl FromStr for PfetchInfo {
 
 #[derive(Debug)]
 pub struct Config {
-    pub args: Args,
     pub ascii: Option<String>,
     pub col1: Option<Color>,
     pub col2: Option<Color>,
@@ -95,17 +94,11 @@ pub struct Config {
     pub host_fields: Vec<HostField>,
     pub custom_logos: Option<String>,
     pub raw_logo: Option<String>,
-    pub print_version: bool,
-    pub print_help: bool,
     pub stdout_is_terminal: bool,
 }
 
 impl Config {
-    pub fn load() -> Self {
-        let args = crate::cli::parse_args();
-        if args.print_version || args.print_help {
-            return Self::for_help_or_version(args);
-        }
+    pub fn load(args: Args) -> Self {
         let source = args
             .source
             .clone()
@@ -117,33 +110,6 @@ impl Config {
         }
         let stdout_is_terminal = std::io::stdout().is_terminal();
         Self::from_env(std::env::vars(), args, stdout_is_terminal)
-    }
-
-    fn for_help_or_version(args: Args) -> Self {
-        let stdout_is_terminal = std::io::stdout().is_terminal();
-        Self {
-            ascii: None,
-            col1: None,
-            col2: None,
-            col3: None,
-            col3_is_col1: false,
-            color: false,
-            sep: String::new(),
-            pad1: 0,
-            pad2: 3,
-            pad3: 1,
-            user: None,
-            hostname: None,
-            fast_pkg_count: false,
-            info: Vec::new(),
-            host_fields: HostField::ALL.to_vec(),
-            custom_logos: None,
-            raw_logo: None,
-            print_version: args.print_version,
-            print_help: args.print_help,
-            stdout_is_terminal,
-            args,
-        }
     }
 
     pub fn from_env(
@@ -172,7 +138,6 @@ impl Config {
         };
 
         let mut config = Self {
-            args: Args::default(),
             ascii: env.get("PF_ASCII").cloned(),
             col1,
             col2: parse_color("PF_COL2"),
@@ -190,8 +155,6 @@ impl Config {
             host_fields: parse_pf_host(env.get("PF_HOST").map(|s| s.as_str())),
             custom_logos: env.get("PF_CUSTOM_LOGOS").cloned(),
             raw_logo: None,
-            print_version: args.print_version,
-            print_help: args.print_help,
             stdout_is_terminal,
         };
 
@@ -203,7 +166,6 @@ impl Config {
         }
 
         config.apply_cli_overrides(&args);
-        config.args = args;
         config
     }
 
