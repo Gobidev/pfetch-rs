@@ -2,7 +2,6 @@ use libmacchina::{
     traits::GeneralReadout as _, traits::KernelReadout as _, traits::MemoryReadout as _,
     traits::PackageReadout as _, GeneralReadout, KernelReadout, MemoryReadout, PackageReadout,
 };
-use pfetch_logo_parser::Color;
 use std::env;
 
 mod cli;
@@ -10,6 +9,7 @@ mod config;
 mod render;
 
 use config::{Config, PfetchInfo};
+use render::InfoLine;
 
 struct Readouts {
     general_readout: GeneralReadout,
@@ -89,15 +89,25 @@ fn main() {
         logo.secondary_color = color;
     }
 
-    let gathered_pfetch_info: Vec<(Color, String, String)> = config
+    let gathered_pfetch_info: Vec<InfoLine> = config
         .info
         .iter()
         .filter_map(|info| {
             get_info(info, &readouts, &config, &os).map(|info_str| match info {
-                PfetchInfo::Title => (logo.secondary_color, info_str, "".to_string()),
-                PfetchInfo::BlankLine => (logo.primary_color, "".to_string(), "".to_string()),
-                PfetchInfo::Palette => (logo.primary_color, info_str, "".to_string()),
-                _ => (logo.primary_color, info.to_string(), info_str),
+                PfetchInfo::Title => InfoLine::Standalone {
+                    color: logo.secondary_color,
+                    text: info_str,
+                },
+                PfetchInfo::BlankLine => InfoLine::Blank,
+                PfetchInfo::Palette => InfoLine::Standalone {
+                    color: logo.primary_color,
+                    text: info_str,
+                },
+                _ => InfoLine::KeyValue {
+                    color: logo.primary_color,
+                    key: info.to_string(),
+                    value: info_str,
+                },
             })
         })
         .collect();
@@ -105,5 +115,5 @@ fn main() {
     let logo_enabled =
         config.raw_logo.is_some() || config.info.iter().any(|x| matches!(x, PfetchInfo::Ascii));
 
-    render::pfetch(gathered_pfetch_info, logo, logo_enabled, &config);
+    render::pfetch(&gathered_pfetch_info, logo, logo_enabled, &config);
 }
