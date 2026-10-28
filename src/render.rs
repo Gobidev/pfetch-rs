@@ -1,32 +1,31 @@
 use crate::config::Config;
-use pfetch_logo_parser::{Color, Logo, LogoPart};
+use pfetch_logo_parser::{Color, Logo};
 use std::fmt::Write as _;
 use unicode_width::UnicodeWidthStr;
 
 pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool, config: &Config) {
-    let (display_lines, width_per_line): (Vec<String>, Vec<usize>) =
-        if let Some(raw) = &config.raw_logo {
-            let display: Vec<String> = raw.lines().map(|s| s.to_string()).collect();
-            let widths: Vec<usize> = display
-                .iter()
-                .map(|line| strip_ansi(line).width())
-                .collect();
-            (display, widths)
+    let (display_lines, width_per_line): (Vec<String>, Vec<usize>) = if !logo_enabled {
+        (Vec::new(), Vec::new())
+    } else if let Some(raw) = &config.raw_logo {
+        let display: Vec<String> = raw.lines().map(|s| s.to_string()).collect();
+        let widths: Vec<usize> = display
+            .iter()
+            .map(|line| strip_ansi(line).width())
+            .collect();
+        (display, widths)
+    } else {
+        let plain_logo = format!("{:#}", logo);
+        let widths: Vec<usize> = plain_logo.lines().map(|s| s.width()).collect();
+        let display: Vec<String> = if config.color {
+            logo.to_string()
         } else {
-            let colored_logo = if config.color {
-                logo.to_string()
-            } else {
-                format!("{:#}", logo)
-            };
-            let raw_text = logo
-                .logo_parts
-                .iter()
-                .map(|LogoPart { content, .. }| content.as_ref())
-                .collect::<String>();
-            let display: Vec<String> = colored_logo.lines().map(|s| s.to_string()).collect();
-            let widths: Vec<usize> = raw_text.lines().map(|s| s.width()).collect();
-            (display, widths)
-        };
+            plain_logo
+        }
+        .lines()
+        .map(|s| s.to_string())
+        .collect();
+        (display, widths)
+    };
 
     let logo_width = *width_per_line.iter().max().unwrap_or(&0);
     let line_amount = if logo_enabled {
@@ -71,8 +70,8 @@ pub fn pfetch(info: Vec<(Color, String, String)>, logo: Logo, logo_enabled: bool
             output.push_str(display_lines.get(l).map_or("", |s| s.as_str()));
         }
 
-        let current_width = width_per_line.get(l).copied().unwrap_or(0);
         let padding2 = if logo_enabled {
+            let current_width = width_per_line.get(l).copied().unwrap_or(0);
             logo_width.saturating_sub(current_width) + config.pad2
         } else {
             0
