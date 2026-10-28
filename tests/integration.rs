@@ -80,6 +80,57 @@ fn info_without_ascii_has_no_logo_padding() {
     }
 }
 
+fn value_column(line: &str, key: &str) -> Option<usize> {
+    let rest = line
+        .strip_prefix(key)
+        .unwrap_or_else(|| panic!("line does not start with {key:?}: {line:?}"));
+    let value = rest.trim_start_matches(' ');
+    if value.is_empty() {
+        None
+    } else {
+        Some(key.len() + rest.len() - value.len())
+    }
+}
+
+#[test]
+fn standalone_lines_have_no_trailing_space() {
+    let output = pfetch()
+        .args(["--no-color", "--info", "title os"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert_eq!(stdout.lines().count(), 2);
+    for line in stdout.lines() {
+        assert!(
+            !line.ends_with(' '),
+            "line should not end with a space: {line:?}"
+        );
+    }
+}
+
+#[test]
+fn key_value_values_align_without_title() {
+    let output = pfetch()
+        .args(["--no-color", "--info", "kernel os"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut lines = stdout.lines();
+    let kernel = lines.next().expect("missing kernel line");
+    let os = lines.next().expect("missing os line");
+    assert_eq!(lines.next(), None);
+    let (Some(kernel_column), Some(os_column)) =
+        (value_column(kernel, "kernel"), value_column(os, "os"))
+    else {
+        // Some platforms/configurations report an empty kernel or os value; alignment is
+        // not observable in that case.
+        return;
+    };
+    assert_eq!(kernel_column, os_column);
+}
+
 #[test]
 fn separator_override() {
     let output = pfetch()
