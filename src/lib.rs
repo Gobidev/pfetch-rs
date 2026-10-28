@@ -125,14 +125,28 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
             };
             // check for Bazzite
             if content.pretty_name.contains("Bazzite") {
-                return Some(format!("Bazzite {version}"));
+                return Some(with_version("Bazzite", &version));
             }
-            if !version.is_empty() {
-                return Some(format!("{} {}", content.name, version));
-            }
-            Some(content.name)
+            Some(with_version(&content.name, &version))
         }
-        _ => Some(general_readout.os_name().ok()?.replace("Unknown", "")),
+        _ => trim_unknown(&general_readout.os_name().ok()?),
+    }
+}
+
+fn with_version(name: &str, version: &str) -> String {
+    if version.is_empty() {
+        name.to_string()
+    } else {
+        format!("{name} {version}")
+    }
+}
+
+fn trim_unknown(name: &str) -> Option<String> {
+    let trimmed = name.replace("Unknown", "").trim().to_string();
+    if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed)
     }
 }
 
@@ -508,5 +522,22 @@ mod tests {
         assert!(should_use_arch_fallback(&HostField::ALL, ""));
         assert!(!should_use_arch_fallback(&[HostField::Model], ""));
         assert!(!should_use_arch_fallback(&HostField::ALL, "Laptop"));
+    }
+
+    #[test]
+    fn test_with_version() {
+        assert_eq!(with_version("Bazzite", ""), "Bazzite");
+        assert_eq!(with_version("Bazzite", "41"), "Bazzite 41");
+        assert_eq!(with_version("Arch Linux", ""), "Arch Linux");
+    }
+
+    #[test]
+    fn test_trim_unknown() {
+        assert_eq!(
+            trim_unknown("macOS 26.0 Unknown"),
+            Some("macOS 26.0".to_string())
+        );
+        assert_eq!(trim_unknown("Unknown"), None);
+        assert_eq!(trim_unknown("FreeBSD"), Some("FreeBSD".to_string()));
     }
 }

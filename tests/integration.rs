@@ -103,6 +103,23 @@ fn logo_override() {
 }
 
 #[test]
+fn versioned_crystal_linux_uses_crystal_logo() {
+    let output = pfetch()
+        .args([
+            "--logo",
+            "Crystal Linux 2024.1",
+            "--info",
+            "ascii",
+            "--no-color",
+        ])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("-//."), "stdout: {stdout}");
+}
+
+#[test]
 fn raw_logo_from_stdin() {
     let mut child = pfetch()
         .args(["--file-raw", "-", "--info", "title"])
