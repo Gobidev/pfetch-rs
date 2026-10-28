@@ -44,7 +44,16 @@ fn render(info: &[InfoLine], logo: &Logo, logo_enabled: bool, config: &Config) -
     let (display_lines, width_per_line): (Vec<String>, Vec<usize>) = if !logo_enabled {
         (Vec::new(), Vec::new())
     } else if let Some(raw) = &config.raw_logo {
-        let display: Vec<String> = raw.lines().map(|s| s.to_string()).collect();
+        let display: Vec<String> = raw
+            .lines()
+            .map(|s| {
+                if config.color {
+                    s.to_string()
+                } else {
+                    strip_ansi(s)
+                }
+            })
+            .collect();
         let widths: Vec<usize> = display
             .iter()
             .map(|line| strip_ansi(line).width())
@@ -129,6 +138,7 @@ fn render(info: &[InfoLine], logo: &Logo, logo_enabled: bool, config: &Config) -
                 output.push_str(value);
             }
         }
+        output.push_str(reset);
         output.push('\n');
     }
 

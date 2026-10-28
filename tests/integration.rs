@@ -191,6 +191,50 @@ fn raw_logo_from_stdin() {
 }
 
 #[test]
+fn raw_logo_ansi_stripped_without_color() {
+    let path = std::env::temp_dir().join(format!(
+        "pfetch_raw_ansi_stripped_{}.txt",
+        std::process::id()
+    ));
+    std::fs::write(&path, b"PLAIN\x1b[31mRED\x1b[0m\n").unwrap();
+
+    let output = pfetch()
+        .args([
+            "--file-raw",
+            path.to_str().unwrap(),
+            "--no-color",
+            "--info",
+            "title",
+        ])
+        .output()
+        .unwrap();
+
+    std::fs::remove_file(&path).ok();
+
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(!stdout.contains('\x1b'), "stdout: {stdout:?}");
+    assert!(stdout.contains("PLAINRED"), "stdout: {stdout:?}");
+}
+
+#[test]
+fn color_output_resets_each_line() {
+    let output = pfetch()
+        .args(["--color", "--logo", "arch", "--info", "ascii title os"])
+        .output()
+        .unwrap();
+
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for line in stdout.lines().filter(|line| !line.is_empty()) {
+        assert!(
+            line.ends_with("\x1b[0m"),
+            "line does not end with an SGR reset: {line:?}"
+        );
+    }
+}
+
+#[test]
 fn raw_logo_missing_file_errors() {
     let output = pfetch()
         .args(["--file-raw", "/nonexistent/file.txt"])
