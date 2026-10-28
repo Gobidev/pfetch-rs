@@ -237,3 +237,34 @@ fn tilde_custom_logos_path_is_expanded() {
     assert!(output.status.success());
     assert!(stdout.contains("TILDE"), "stdout: {stdout}");
 }
+
+#[test]
+fn dotenv_in_cwd_is_not_loaded_implicitly() {
+    let dir = std::env::temp_dir().join(format!("pfetch_dotenv_{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        dir.join(".env"),
+        "PF_INFO=memory\nUSER=bogus_dotenv_user\nHOSTNAME=bogus_dotenv_host\n",
+    )
+    .unwrap();
+
+    let output = pfetch()
+        .current_dir(&dir)
+        .env_remove("USER")
+        .env_remove("HOSTNAME")
+        .output()
+        .unwrap();
+
+    std::fs::remove_dir_all(&dir).ok();
+
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        !stdout.contains("bogus_dotenv_user") && !stdout.contains("bogus_dotenv_host"),
+        "values from .env were used: {stdout}"
+    );
+    assert!(
+        stdout.contains('@'),
+        "PF_INFO from .env was used, stdout: {stdout}"
+    );
+}

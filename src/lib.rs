@@ -111,7 +111,7 @@ pub fn os(general_readout: &GeneralReadout) -> Option<String> {
     match env::consts::OS {
         "linux" => {
             // check for Bedrock Linux
-            if dotenvy::var("PATH")
+            if env::var("PATH")
                 .unwrap_or_default()
                 .contains("/bedrock/cross/")
             {
@@ -333,7 +333,7 @@ pub fn shell(general_readout: &GeneralReadout) -> Option<String> {
             libmacchina::traits::ShellKind::Default,
         )
         .ok()
-        .or_else(|| dotenvy::var("SHELL").ok())
+        .or_else(|| env::var("SHELL").ok())
 }
 
 pub fn editor() -> Option<String> {
@@ -351,7 +351,7 @@ pub fn de(general_readout: &GeneralReadout) -> Option<String> {
     general_readout
         .desktop_environment()
         .ok()
-        .or_else(|| dotenvy::var("XDG_CURRENT_DESKTOP").ok())
+        .or_else(|| env::var("XDG_CURRENT_DESKTOP").ok())
 }
 
 pub fn palette(color_enabled: bool) -> String {

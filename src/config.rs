@@ -109,7 +109,7 @@ impl Config {
         let source = args
             .source
             .clone()
-            .or_else(|| dotenvy::var("PF_SOURCE").ok());
+            .or_else(|| std::env::var("PF_SOURCE").ok());
         if let Some(filepath) = source {
             if let Err(err) = dotenvy::from_path(pfetch::expand_tilde(&filepath)) {
                 eprintln!("Warning: Could not load source file '{filepath}': {err}");
