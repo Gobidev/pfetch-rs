@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.1.1] - 2026-10-28
+
+### Bug Fixes
+
+- Stop reading .env files implicitly (#83)
+- Map color 9 to the default foreground (#86)
+- Trim NUL terminator from devicetree model (#87)
+- Trim versionless names and match versioned Crystal Linux (#88)
+- Derive secondary color as primary % 8 + 1 (#90)
+- Handle multi-digit colors and correct logo part splitting (#89)
+- Reset colors per line and strip raw-logo ANSI when uncolored (#93)
+
+### Miscellaneous
+
+- Remove dead code and fix arg errors (#85)
+- Update dependencies
+
+### Performance
+
+- Skip logo work when hidden and use constant palette strings (#91)
+
+### Refactor
+
+- Handle help and version before loading config (#84)
+- Represent info lines with a typed enum (#92)
+
+### Ci
+
+- Guard logo render job and fix artifacts (#94)
+
 ## [3.1.0] - 2026-10-26
 
 ### Bug Fixes
