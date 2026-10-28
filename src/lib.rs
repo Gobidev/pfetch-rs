@@ -189,8 +189,17 @@ impl HostField {
             HostField::Version => "/sys/devices/virtual/dmi/id/product_version",
             HostField::Model => "/sys/firmware/devicetree/base/model",
         };
-        fs::read_to_string(path).unwrap_or_default()
+        let value = fs::read_to_string(path).unwrap_or_default();
+        if matches!(self, HostField::Model) {
+            trim_nul(&value).to_owned()
+        } else {
+            value
+        }
     }
+}
+
+fn trim_nul(value: &str) -> &str {
+    value.trim_end_matches(['\0', '\n'])
 }
 
 impl std::str::FromStr for HostField {
@@ -456,6 +465,26 @@ mod tests {
             expand_tilde("~user/logos.txt"),
             PathBuf::from("~user/logos.txt")
         );
+    }
+
+    #[test]
+    fn test_trim_nul_single_terminator() {
+        assert_eq!(trim_nul("Pi 4\0"), "Pi 4");
+    }
+
+    #[test]
+    fn test_trim_nul_multiple_terminators() {
+        assert_eq!(trim_nul("Pi 4\0\0"), "Pi 4");
+    }
+
+    #[test]
+    fn test_trim_nul_without_terminator() {
+        assert_eq!(trim_nul("Pi 4"), "Pi 4");
+    }
+
+    #[test]
+    fn test_trim_nul_trailing_newline() {
+        assert_eq!(trim_nul("Pi 4\0\n"), "Pi 4");
     }
 
     #[test]
