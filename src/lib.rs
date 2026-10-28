@@ -373,13 +373,6 @@ fn check_if_command_exists(command: &str) -> bool {
     which::which(command).is_ok()
 }
 
-fn _system_command_error(command: &str, args: &[&str]) -> Result<String> {
-    let mut output =
-        String::from_utf8_lossy(&Command::new(command).args(args).output()?.stderr).into_owned();
-    output.truncate(output.trim_end().len());
-    Ok(output)
-}
-
 /// Return the amount of line the output of a system command produces
 /// Returns `0` if command fails
 fn run_and_count_lines(command: &str, args: &[&str]) -> usize {

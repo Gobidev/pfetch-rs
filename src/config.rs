@@ -201,8 +201,7 @@ fn read_raw_logo(path: &str) -> Result<String, String> {
 fn parse_pf_info(info: Option<&str>) -> Vec<PfetchInfo> {
     let base: Vec<PfetchInfo> = match info {
         Some(pfetch_infos) => pfetch_infos
-            .trim()
-            .split(' ')
+            .split_whitespace()
             .map(PfetchInfo::from_str)
             .filter_map(|i| i.ok())
             .collect(),
@@ -320,6 +319,35 @@ mod tests {
             config.info,
             vec![PfetchInfo::Title, PfetchInfo::BlankLine, PfetchInfo::Os]
         );
+    }
+
+    #[test]
+    fn test_config_info_splits_on_whitespace() {
+        let config = Config::from_env(test_env(&[("PF_INFO", "title\tos")]), Args::default(), true);
+        assert_eq!(config.info, vec![PfetchInfo::Title, PfetchInfo::Os]);
+    }
+
+    #[test]
+    fn test_config_empty_info() {
+        let config = Config::from_env(test_env(&[("PF_INFO", "")]), Args::default(), true);
+        assert!(config.info.is_empty());
+    }
+
+    #[test]
+    fn test_read_raw_logo_from_file() {
+        let path = std::env::temp_dir().join(format!("pfetch-raw-logo-{}", std::process::id()));
+        std::fs::write(&path, "logo contents").unwrap();
+        let result = read_raw_logo(path.to_str().unwrap());
+        std::fs::remove_file(&path).unwrap();
+        assert_eq!(result, Ok("logo contents".to_string()));
+    }
+
+    #[test]
+    fn test_read_raw_logo_missing_file() {
+        let path = std::env::temp_dir().join(format!("pfetch-missing-logo-{}", std::process::id()));
+        let path = path.to_str().unwrap();
+        let err = read_raw_logo(path).unwrap_err();
+        assert!(err.contains(path));
     }
 
     #[test]
