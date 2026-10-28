@@ -138,7 +138,7 @@ pub fn try_parse_logo(input: &str) -> Result<Option<(bool, Logo)>, String> {
             .map_err(|_| format!("Invalid color: {}", color.as_str()))?,
         None => 7,
     };
-    let secondary_color = (primary_color + 1) % 8;
+    let secondary_color = primary_color % 8 + 1;
     let logo = input
         .split_once("EOF\n")
         .ok_or_else(|| {
@@ -281,5 +281,34 @@ mod tests {
     fn test_parse_logo_panics_on_invalid_input() {
         let result = std::panic::catch_unwind(|| parse_logo("[Aa]rch*)"));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_secondary_color_defaults_to_eight() {
+        let input = "[Aa]rch*)\n\tread_ascii <<- EOF\n\t\t${c7}  /\\\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.primary_color.0, Some(7));
+        assert_eq!(logo.secondary_color.0, Some(8));
+    }
+
+    #[test]
+    fn test_secondary_color_for_primary_one() {
+        let input = "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}  /\\\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.secondary_color.0, Some(2));
+    }
+
+    #[test]
+    fn test_secondary_color_for_primary_seven() {
+        let input = "[Aa]rch*)\n\tread_ascii 7 <<- EOF\n\t\t${c7}  /\\\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.secondary_color.0, Some(8));
+    }
+
+    #[test]
+    fn test_secondary_color_for_primary_eight() {
+        let input = "[Aa]rch*)\n\tread_ascii 8 <<- EOF\n\t\t${c8}  /\\\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.secondary_color.0, Some(1));
     }
 }
