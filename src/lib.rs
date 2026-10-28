@@ -378,11 +378,10 @@ pub fn de(general_readout: &GeneralReadout) -> Option<String> {
 }
 
 pub fn palette(color_enabled: bool) -> String {
-    if color_enabled {
-        (1..7).fold("".to_string(), |a, e| a + &format!("\x1b[4{e}m  ")) + "\x1b[0m"
-    } else {
-        "      ".to_string()
-    }
+    const COLORED: &str = "\x1b[41m  \x1b[42m  \x1b[43m  \x1b[44m  \x1b[45m  \x1b[46m  \x1b[0m";
+    const PLAIN: &str = "      ";
+
+    String::from(if color_enabled { COLORED } else { PLAIN })
 }
 
 fn run_system_command(command: &str, args: &[&str]) -> Result<String> {
@@ -515,6 +514,19 @@ mod tests {
     fn test_format_host_empty() {
         assert_eq!(format_host(&[]), "");
         assert_eq!(format_host(&["System Product Name".to_string()]), "");
+    }
+
+    #[test]
+    fn test_palette_plain() {
+        assert_eq!(palette(false), "      ");
+    }
+
+    #[test]
+    fn test_palette_colored() {
+        assert_eq!(
+            palette(true),
+            "\x1b[41m  \x1b[42m  \x1b[43m  \x1b[44m  \x1b[45m  \x1b[46m  \x1b[0m"
+        );
     }
 
     #[test]
