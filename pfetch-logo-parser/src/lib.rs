@@ -108,7 +108,11 @@ impl Display for Logo {
 
 fn logo_regex() -> &'static Regex {
     static LOGO_REGEX: OnceLock<Regex> = OnceLock::new();
-    LOGO_REGEX.get_or_init(|| Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d)?").unwrap())
+    LOGO_REGEX.get_or_init(|| Regex::new(r"^\(?(.*)\)[\s\S]*read_ascii *(\d+)?").unwrap())
+}
+
+fn unescape(input: &str) -> String {
+    input.replace("\\\\", "\\").replace("\\`", "`")
 }
 
 /// Parses a logo in pfetch format.
@@ -152,31 +156,28 @@ pub fn try_parse_logo(input: &str) -> Result<Option<(bool, Logo)>, String> {
         .0;
 
     let mut logo_parts = vec![];
-    for logo_part in logo.split("${") {
-        if let Some((new_color, rest)) = logo_part.split_once('}') {
-            let new_color: u8 = new_color
-                .get(1..)
-                .and_then(|num| num.parse().ok())
-                .ok_or_else(|| format!("Invalid color: {new_color}"))?;
-            let rest = rest.replace("\\\\", "\\");
-            let rest = rest.replace("\\`", "`");
-            let lines = rest.split('\n').collect::<Vec<_>>();
-            let last_index = lines.len() - 1;
-            for (index, line) in lines.into_iter().enumerate() {
-                let mut line = line.to_owned();
-                if index != last_index {
-                    line += "\n";
-                }
-                logo_parts.push(LogoPart {
-                    color: Color(Some(new_color)),
-                    content: line.into(),
-                });
-            }
-        } else if !logo_part.is_empty() {
-            let logo_part = logo_part.replace("\\\\", "\\");
+    let mut segments = logo.split("${");
+    if let Some(prefix) = segments.next() {
+        if !prefix.is_empty() {
             logo_parts.push(LogoPart {
                 color: Color(None),
-                content: logo_part.into(),
+                content: unescape(prefix).into(),
+            });
+        }
+    }
+    for logo_part in segments {
+        let (new_color, rest) = logo_part
+            .split_once('}')
+            .ok_or_else(|| "Unterminated color".to_string())?;
+        let new_color: u8 = new_color
+            .get(1..)
+            .and_then(|num| num.parse().ok())
+            .ok_or_else(|| format!("Invalid color: {new_color}"))?;
+        let rest = unescape(rest);
+        for line in rest.split_inclusive('\n') {
+            logo_parts.push(LogoPart {
+                color: Color(Some(new_color)),
+                content: line.to_owned().into(),
             });
         }
     }
@@ -223,6 +224,38 @@ mod tests {
         assert_eq!(logo.primary_color.0, Some(1));
         assert_eq!(logo.secondary_color.0, Some(2));
         assert!(!logo.logo_parts.is_empty());
+    }
+
+    #[test]
+    fn test_parse_logo_multi_digit_color() {
+        let input = "[Ff]iwix*)\n\tread_ascii 12 <<- EOF\n\t\t${c1}x\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.primary_color.0, Some(12));
+    }
+
+    #[test]
+    fn test_parse_logo_no_empty_parts() {
+        let input = "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1}one\n\t\t${c1}two\n\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.logo_parts.len(), 2);
+        assert!(logo.logo_parts.iter().all(|part| !part.content.is_empty()));
+    }
+
+    #[test]
+    fn test_parse_logo_plain_prefix_with_brace() {
+        let input = "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\tplain} prefix ${c1}x\n\tEOF\n";
+        let (_, logo) = parse_logo(input).unwrap();
+        assert_eq!(logo.logo_parts.len(), 2);
+        assert_eq!(logo.logo_parts[0].color.0, None);
+        assert_eq!(logo.logo_parts[0].content, "plain} prefix ");
+        assert_eq!(logo.logo_parts[1].color.0, Some(1));
+    }
+
+    #[test]
+    fn test_parse_logo_unterminated_color() {
+        let input = "[Aa]rch*)\n\tread_ascii 1 <<- EOF\n\t\t${c1\n\tEOF\n";
+        let err = try_parse_logo(input).unwrap_err();
+        assert!(err.contains("Unterminated color"), "{err}");
     }
 
     #[test]
