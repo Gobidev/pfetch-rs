@@ -28,31 +28,31 @@ jobs:
             name: Linux x86_64
             target: x86_64-unknown-linux-gnu
             cross: false
-            strip: true
+            binary: pfetch
 
           - os: ubuntu-latest
             name: FreeBSD
             target: x86_64-unknown-freebsd
             cross: true
-            strip: true
+            binary: pfetch
 
           - os: ubuntu-latest
             name: Android
             target: aarch64-linux-android
             cross: true
-            strip: true
+            binary: pfetch
 
           - os: windows-latest
             name: Windows x86_64
             target: x86_64-pc-windows-gnu
             cross: false
-            strip: true
+            binary: pfetch.exe
 
           - os: macos-latest
             name: macOS x86_64
             target: x86_64-apple-darwin
             cross: false
-            strip: true
+            binary: pfetch
 
     steps:
       - name: Checkout
@@ -83,14 +83,18 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pfetch-${{ matrix.target }}
-          path: /tmp/${{ matrix.target }}/debug/pfetch
+          path: /tmp/${{ matrix.target }}/debug/${{ matrix.binary }}
+          if-no-files-found: error
 
       - name: Test
         if: ${{ !matrix.cross }}
         run: cargo test --workspace --target=${{ matrix.target }}
   render:
     needs: checks
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: render-logos
+      cancel-in-progress: true
     permissions:
       contents: write
     runs-on: ubuntu-latest
