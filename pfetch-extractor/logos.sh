@@ -211,6 +211,21 @@ case ${1:-${PF_ASCII:-${distro:-$os}}} in
 			EOF
         ;;
 
+    [Dd]aras*)
+        read_ascii 4 <<- EOF
+				${c4}      /\\
+				${c4}     /  \\
+				${c4}    /    \\
+				${c4}   /      \\
+				${c4}  /        \\
+				${c4} /          \\
+				${c4}|            |
+				${c4}|            |
+				${c4} \\          /
+				${c4}  \\________/
+			EOF
+        ;;
+
     [Dd]ebian*)
         read_ascii 1 <<- EOF
 				${c1}  _____
